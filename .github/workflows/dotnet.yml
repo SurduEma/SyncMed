@@ -20,7 +20,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore SyncMed.sln
+      run: dotnet restore "SyncMed/SyncMed.sln"
 
     - name: Build Web App
-      run: dotnet build SyncMed.sln --no-restore --configuration Release
+      run: dotnet build "SyncMed/SyncMed.sln" --no-restore --configuration Release
