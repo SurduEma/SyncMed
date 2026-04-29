@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Specialties";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/specialties.css" />
+}
+
+<div class="specialties-page">
+    <section class="specialties-header">
+        <h1>Our Specialties</h1>
+        <p>Discover comprehensive medical services across multiple specialties. Our expert doctors provide specialized care tailored to your health needs.</p>
+    </section>
+
+    <section class="specialties-grid">
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/cardiology.jpg" alt="Cardiology" />
+            </div>
+            <h2>Cardiology</h2>
+            <p>Consult with experienced cardiologists for comprehensive heart care, including diagnosis, treatment, and prevention of cardiovascular conditions.</p>
+            <a href="#" class="specialty-link">Learn about Cardiology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/neurology.jpg" alt="Neurology" />
+            </div>
+            <h2>Neurology</h2>
+            <p>Expert evaluation and treatment of neurological disorders affecting the brain, spinal cord, and nerves with advanced diagnostic techniques.</p>
+            <a href="#" class="specialty-link">Learn about Neurology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/orthopedics.jpg" alt="Orthopedics" />
+            </div>
+            <h2>Orthopedics</h2>
+            <p>Specialized care for musculoskeletal conditions, including bone injuries, joint problems, and sports medicine from our orthopedic specialists.</p>
+            <a href="#" class="specialty-link">Learn about Orthopedics</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/general.jpg" alt="General Practice" />
+            </div>
+            <h2>General Practice</h2>
+            <p>Comprehensive primary care services for your general health needs, preventive medicine, and management of chronic conditions.</p>
+            <a href="#" class="specialty-link">Learn about General Practice</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/dermatology.jpg" alt="Dermatology" />
+            </div>
+            <h2>Dermatology</h2>
+            <p>Expert diagnosis and treatment of skin conditions, including acne, eczema, psoriasis, and cosmetic dermatological procedures.</p>
+            <a href="#" class="specialty-link">Learn about Dermatology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/gastroenterology.jpg" alt="Gastroenterology" />
+            </div>
+            <h2>Gastroenterology</h2>
+            <p>Specialized care for digestive system disorders including endoscopic procedures, colonoscopies, and treatment of GI conditions.</p>
+            <a href="#" class="specialty-link">Learn about Gastroenterology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/endocrinology.jpg" alt="Endocrinology" />
+            </div>
+            <h2>Endocrinology</h2>
+            <p>Expert management of hormone-related conditions including diabetes, thyroid disorders, and metabolic diseases.</p>
+            <a href="#" class="specialty-link">Learn about Endocrinology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/pediatrics.jpg" alt="Pediatrics" />
+            </div>
+            <h2>Pediatrics</h2>
+            <p>Comprehensive healthcare for children from newborns through adolescents, including preventive care and treatment of childhood conditions.</p>
+            <a href="#" class="specialty-link">Learn about Pediatrics</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/ophtalmology.jpg" alt="Ophthalmology" />
+            </div>
+            <h2>Ophthalmology</h2>
+            <p>Complete eye care services including vision correction, cataract surgery, glaucoma treatment, and management of eye diseases.</p>
+            <a href="#" class="specialty-link">Learn about Ophthalmology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/ent.jpg" alt="Otolaryngology (ENT)" />
+            </div>
+            <h2>Otolaryngology (ENT)</h2>
+            <p>Treatment of ear, nose, and throat conditions including hearing loss, sinusitis, and sleep apnea with advanced surgical options.</p>
+            <a href="#" class="specialty-link">Learn about Otolaryngology</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/psychiatry.jpg" alt="Psychiatry" />
+            </div>
+            <h2>Psychiatry</h2>
+            <p>Mental health services for depression, anxiety, bipolar disorder, and other psychiatric conditions with compassionate, evidence-based care.</p>
+            <a href="#" class="specialty-link">Learn about Psychiatry</a>
+        </div>
+
+        <div class="specialty-card">
+            <div class="specialty-image">
+                <img src="~/assets/specialties-img/urology.jpg" alt="Urology" />
+            </div>
+            <h2>Urology</h2>
+            <p>Specialized treatment of urinary tract and male reproductive system disorders for both men and women.</p>
+            <a href="#" class="specialty-link">Learn about Urology</a>
+        </div>
+    </section>
+</div>

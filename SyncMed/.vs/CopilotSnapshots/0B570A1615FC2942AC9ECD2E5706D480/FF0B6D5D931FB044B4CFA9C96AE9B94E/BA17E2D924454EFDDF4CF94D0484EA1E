@@ -1,0 +1,30 @@
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SyncMed.Data;
+using SyncMed.Models;
+
+namespace SyncMed.Pages.Appointments;
+
+public class IndexModel : PageModel
+{
+    private readonly SyncMedDbContext _context;
+
+    public IndexModel(SyncMedDbContext context)
+    {
+        _context = context;
+    }
+
+    public IList<Appointment> Appointments { get; set; } = default!;
+
+    public async Task OnGetAsync()
+    {
+        Appointments = await _context.Appointments
+            .Include(a => a.Patient)
+                .ThenInclude(p => p.User)
+            .Include(a => a.Doctor)
+                .ThenInclude(d => d.User)
+            .OrderByDescending(a => a.AppointmentDate)
+                .ThenByDescending(a => a.AppointmentTime)
+            .ToListAsync();
+    }
+}

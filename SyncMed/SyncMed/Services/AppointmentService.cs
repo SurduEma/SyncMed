@@ -1,0 +1,178 @@
+using SyncMed.Data.Repositories;
+using SyncMed.Models;
+
+namespace SyncMed.Services;
+
+public interface IAppointmentService
+{
+    Task<IList<Appointment>> GetAllAppointmentsAsync();
+    Task<Appointment?> GetAppointmentByIdAsync(int id);
+    Task<(bool Success, string Message)> BookAppointmentAsync(int patientId, int doctorId, DateOnly date, TimeOnly time);
+    Task UpdateAppointmentAsync(Appointment appointment);
+    Task<(bool Success, string Message)> CancelAppointmentAsync(int appointmentId);
+    Task<(bool Success, string Message)> ConfirmAppointmentAsync(int appointmentId);
+    Task<List<TimeOnly>> GetAvailableTimeSlotsAsync(int doctorId, DateOnly date);
+}
+
+public class AppointmentService : IAppointmentService
+{
+    private readonly IAppointmentRepository _appointmentRepository;
+    private readonly IDoctorRepository _doctorRepository;
+    private readonly IPatientRepository _patientRepository;
+    private const int AppointmentDurationMinutes = 30;
+    private const int WorkingHoursStart = 9; // 9:00 AM
+    private const int WorkingHoursEnd = 20; // 8:00 PM
+
+    public AppointmentService(
+        IAppointmentRepository appointmentRepository,
+        IDoctorRepository doctorRepository,
+        IPatientRepository patientRepository)
+    {
+        _appointmentRepository = appointmentRepository;
+        _doctorRepository = doctorRepository;
+        _patientRepository = patientRepository;
+    }
+
+    public async Task<IList<Appointment>> GetAllAppointmentsAsync()
+    {
+        return await _appointmentRepository.GetAllWithIncludesAsync();
+    }
+
+    public async Task<Appointment?> GetAppointmentByIdAsync(int id)
+    {
+        return await _appointmentRepository.GetByIdWithIncludesAsync(id);
+    }
+
+    public async Task<(bool Success, string Message)> BookAppointmentAsync(
+        int patientId, int doctorId, DateOnly date, TimeOnly time)
+    {
+        // Validate year is 2025 or later
+        if (date.Year < 2025)
+            return (false, "Appointments can only be booked for 2025 or later.");
+
+        // Validate date is not in the past
+        if (date < DateOnly.FromDateTime(DateTime.Today))
+            return (false, "Cannot book appointment in the past.");
+
+        // Validate time is within working hours
+        if (time.Hour < WorkingHoursStart || time.Hour >= WorkingHoursEnd)
+            return (false, $"Appointments must be booked between {WorkingHoursStart}:00 AM and {WorkingHoursEnd}:00 PM.");
+
+        // Validate time slot is on 30-minute intervals (00 or 30 minutes)
+        if (time.Minute != 0 && time.Minute != 30)
+            return (false, "Appointments must start at :00 or :30 minutes.");
+
+        // Validate time is not in the past (if today)
+        if (date == DateOnly.FromDateTime(DateTime.Today) && time <= TimeOnly.FromDateTime(DateTime.Now))
+            return (false, "Cannot book appointment at a time that has already passed.");
+
+        // Validate patient exists
+        var patient = await _patientRepository.GetByIdAsync(patientId);
+        if (patient == null)
+            return (false, "Patient not found.");
+
+        // Validate doctor exists
+        var doctor = await _doctorRepository.GetByIdAsync(doctorId);
+        if (doctor == null)
+            return (false, "Doctor not found.");
+
+        // Check for time-slot overlap
+        var sameDayAppointments = await _appointmentRepository.GetByDoctorAndDateAsync(doctorId, date);
+        var slotDuration = TimeSpan.FromMinutes(AppointmentDurationMinutes);
+        var requestedStart = time;
+        var requestedEnd = time.Add(slotDuration);
+
+        bool hasConflict = sameDayAppointments.Any(existing =>
+            requestedStart < existing.AppointmentTime.Add(slotDuration)
+            && requestedEnd > existing.AppointmentTime);
+
+        if (hasConflict)
+            return (false, $"This time slot overlaps with an existing appointment. Each appointment lasts {AppointmentDurationMinutes} minutes — please choose a different time.");
+
+        // Create and save appointment
+        var appointment = new Appointment
+        {
+            PatientId = patientId,
+            DoctorId = doctorId,
+            AppointmentDate = date,
+            AppointmentTime = time,
+            Status = "Pending"
+        };
+
+        await _appointmentRepository.AddAsync(appointment);
+        return (true, "Appointment booked successfully!");
+    }
+
+    public async Task UpdateAppointmentAsync(Appointment appointment)
+    {
+        var existingAppointment = await _appointmentRepository.GetByIdAsync(appointment.AppointmentId);
+        if (existingAppointment == null)
+            throw new InvalidOperationException("Appointment not found.");
+
+        await _appointmentRepository.UpdateAsync(appointment);
+    }
+
+    public async Task<(bool Success, string Message)> CancelAppointmentAsync(int appointmentId)
+    {
+        var appointment = await _appointmentRepository.GetByIdAsync(appointmentId);
+        if (appointment == null)
+            return (false, "Appointment not found.");
+
+        if (appointment.Status == "Cancelled")
+            return (false, "Appointment is already cancelled.");
+
+        appointment.Status = "Cancelled";
+        await _appointmentRepository.UpdateAsync(appointment);
+        return (true, "Appointment cancelled successfully.");
+    }
+
+    public async Task<(bool Success, string Message)> ConfirmAppointmentAsync(int appointmentId)
+    {
+        var appointment = await _appointmentRepository.GetByIdAsync(appointmentId);
+        if (appointment == null)
+            return (false, "Appointment not found.");
+
+        if (appointment.Status == "Confirmed")
+            return (false, "Appointment is already confirmed.");
+
+        appointment.Status = "Confirmed";
+        await _appointmentRepository.UpdateAsync(appointment);
+        return (true, "Appointment confirmed successfully.");
+    }
+
+    public async Task<List<TimeOnly>> GetAvailableTimeSlotsAsync(int doctorId, DateOnly date)
+    {
+        var availableSlots = new List<TimeOnly>();
+
+        // Generate all possible time slots (9:00 AM to 8:00 PM in 30-minute intervals)
+        for (int hour = WorkingHoursStart; hour < WorkingHoursEnd; hour++)
+        {
+            availableSlots.Add(new TimeOnly(hour, 0));
+            availableSlots.Add(new TimeOnly(hour, 30));
+        }
+
+        // Get all appointments for this doctor on this date
+        var bookedAppointments = await _appointmentRepository.GetByDoctorAndDateAsync(doctorId, date);
+
+        // Remove booked slots and overlapping slots
+        var slotDuration = TimeSpan.FromMinutes(AppointmentDurationMinutes);
+        availableSlots = availableSlots
+            .Where(slot =>
+            {
+                var slotEnd = slot.Add(slotDuration);
+                // Check if this slot conflicts with any existing appointment
+                return !bookedAppointments.Any(apt =>
+                    slot < apt.AppointmentTime.Add(slotDuration) && slotEnd > apt.AppointmentTime);
+            })
+            .ToList();
+
+        // Filter out past times if booking for today
+        if (date == DateOnly.FromDateTime(DateTime.Today))
+        {
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            availableSlots = availableSlots.Where(slot => slot > now).ToList();
+        }
+
+        return availableSlots;
+    }
+}

@@ -1,0 +1,134 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using SyncMed.Data;
+using SyncMed.Models;
+
+namespace SyncMed.Pages.Appointments;
+
+public class IndexModel : PageModel
+{
+    private const int AppointmentDurationMinutes = 50;
+
+    private readonly SyncMedDbContext _context;
+
+    public IndexModel(SyncMedDbContext context)
+    {
+        _context = context;
+    }
+
+    public IList<Appointment> Appointments { get; set; } = default!;
+
+    public SelectList DoctorList { get; set; } = default!;
+
+    [BindProperty]
+    public int SelectedDoctorId { get; set; }
+
+    [BindProperty]
+    public DateOnly AppointmentDate { get; set; }
+
+    [BindProperty]
+    public TimeOnly AppointmentTime { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        // Date must not be in the past
+        if (AppointmentDate < DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(AppointmentDate), "Appointment date cannot be in the past.");
+        }
+
+        // If booking today, time must still be in the future
+        if (AppointmentDate == DateOnly.FromDateTime(DateTime.Today)
+            && AppointmentTime <= TimeOnly.FromDateTime(DateTime.Now))
+        {
+            ModelState.AddModelError(nameof(AppointmentTime), "Appointment time must be in the future.");
+        }
+
+        // Doctor must be selected
+        if (SelectedDoctorId == 0)
+        {
+            ModelState.AddModelError(nameof(SelectedDoctorId), "Please select a doctor.");
+        }
+
+        // Check for time-slot overlap with the same doctor on the same day
+        if (ModelState.ErrorCount == 0)
+        {
+            var requestedStart = AppointmentTime;
+            var requestedEnd = AppointmentTime.Add(TimeSpan.FromMinutes(AppointmentDurationMinutes));
+            var slotDuration = TimeSpan.FromMinutes(AppointmentDurationMinutes);
+
+            var sameDayAppointments = await _context.Appointments
+                .Where(a => a.DoctorId == SelectedDoctorId
+                         && a.AppointmentDate == AppointmentDate
+                         && a.Status != "Cancelled")
+                .Select(a => a.AppointmentTime)
+                .ToListAsync();
+
+            bool hasConflict = sameDayAppointments.Any(existingStart =>
+                requestedStart < existingStart.Add(slotDuration)
+                && requestedEnd > existingStart);
+
+            if (hasConflict)
+            {
+                ModelState.AddModelError(nameof(AppointmentTime),
+                    $"This time slot overlaps with an existing appointment. Each appointment lasts {AppointmentDurationMinutes} minutes — please choose a later time.");
+            }
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await LoadDataAsync();
+            return Page();
+        }
+
+        var patient = await _context.Patients.FirstOrDefaultAsync();
+        if (patient == null)
+        {
+            ModelState.AddModelError(string.Empty, "No patient found in the system.");
+            await LoadDataAsync();
+            return Page();
+        }
+
+        var appointment = new Appointment
+        {
+            PatientId = patient.PatientId,
+            DoctorId = SelectedDoctorId,
+            AppointmentDate = AppointmentDate,
+            AppointmentTime = AppointmentTime,
+            Status = "Pending"
+        };
+
+        _context.Appointments.Add(appointment);
+        await _context.SaveChangesAsync();
+
+        return RedirectToPage();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        Appointments = await _context.Appointments
+            .Include(a => a.Patient)
+                .ThenInclude(p => p.User)
+            .Include(a => a.Doctor)
+                .ThenInclude(d => d.User)
+            .OrderByDescending(a => a.AppointmentDate)
+                .ThenByDescending(a => a.AppointmentTime)
+            .ToListAsync();
+
+        var doctors = await _context.Doctors
+            .Include(d => d.User)
+            .ToListAsync();
+
+        DoctorList = new SelectList(
+            doctors.Select(d => new { d.DoctorId, Display = $"Dr. {d.User.FirstName} {d.User.LastName} — {d.Specialty}" }),
+            "DoctorId",
+            "Display");
+    }
+}

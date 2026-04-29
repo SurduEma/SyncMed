@@ -1,0 +1,88 @@
+﻿@page
+@model SyncMed.Pages.Appointments.IndexModel
+
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<div class="container mt-4">
+    <h1>My Appointments</h1>
+    <hr />
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Request a New Appointment</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="SelectedDoctorId" class="form-label">Doctor</label>
+                        <select asp-for="SelectedDoctorId" asp-items="Model.DoctorList" class="form-select">
+                            <option value="">-- Select a Doctor --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="AppointmentDate" class="form-label">Date</label>
+                        <input asp-for="AppointmentDate" class="form-control" type="date" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="AppointmentTime" class="form-label">Time</label>
+                        <input asp-for="AppointmentTime" class="form-control" type="time" />
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Book</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Appointments.Any())
+    {
+        <div class="alert alert-info">
+            <p class="mb-0">You have no appointments scheduled yet. Use the form above to book one.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Doctor</th>
+                    <th>Specialty</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appointment in Model.Appointments)
+                {
+                    <tr>
+                        <td>@appointment.AppointmentDate.ToString("dd MMM yyyy")</td>
+                        <td>@appointment.AppointmentTime.ToString("HH:mm")</td>
+                        <td>Dr. @appointment.Doctor.User.FirstName @appointment.Doctor.User.LastName</td>
+                        <td>@appointment.Doctor.Specialty</td>
+                        <td>
+                            <span class="badge @(appointment.Status switch
+                            {
+                                "Confirmed" => "bg-success",
+                                "Pending" => "bg-warning text-dark",
+                                "Cancelled" => "bg-danger",
+                                _ => "bg-secondary"
+                            })">
+                                @appointment.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

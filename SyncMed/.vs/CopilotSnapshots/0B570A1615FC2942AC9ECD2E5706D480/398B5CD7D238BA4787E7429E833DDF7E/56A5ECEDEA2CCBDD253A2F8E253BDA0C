@@ -1,0 +1,23 @@
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SyncMed.Data;
+using SyncMed.Models;
+
+namespace SyncMed.Pages.Users;
+
+public class IndexModel : PageModel
+{
+    private readonly SyncMedDbContext _context;
+
+    public IndexModel(SyncMedDbContext context)
+    {
+        _context = context;
+    }
+
+    public IList<User> Users { get; set; } = default!;
+
+    public async Task OnGetAsync()
+    {
+        Users = await _context.Users.ToListAsync();
+    }
+}

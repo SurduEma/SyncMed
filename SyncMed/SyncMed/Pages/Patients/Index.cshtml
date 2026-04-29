@@ -1,0 +1,64 @@
+@page
+@model SyncMed.Pages.Patients.IndexModel
+
+@{
+    ViewData["Title"] = "Patients";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Patients</h1>
+            <p class="text-muted">Manage patient records</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-page="Create" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Add New Patient
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Patients.Any())
+    {
+        <div class="alert alert-info">
+            <p class="mb-0">No patients found. <a asp-page="Create">Add the first one</a></p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Date of Birth</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var patient in Model.Patients)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@patient.User.FirstName @patient.User.LastName</strong>
+                            </td>
+                            <td>@patient.User.Email</td>
+                            <td>@patient.DateOfBirth.ToString("dd MMM yyyy")</td>
+                            <td>@patient.PhoneNumber</td>
+                            <td>
+                                <a asp-page="Edit" asp-route-id="@patient.PatientId" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a asp-page="Delete" asp-route-id="@patient.PatientId" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

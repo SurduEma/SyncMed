@@ -1,0 +1,125 @@
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using SyncMed.Models;
+using SyncMed.Services;
+
+namespace SyncMed.Pages.Appointments;
+
+public class SearchModel : PageModel
+{
+    private readonly IAppointmentService _service;
+    private readonly ILogger<SearchModel> _logger;
+
+    public SearchModel(IAppointmentService service, ILogger<SearchModel> logger)
+    {
+        _service = service;
+        _logger = logger;
+    }
+
+    public IList<Appointment> Appointments { get; set; } = default!;
+
+    public string? SearchDoctor { get; set; }
+    public string? SearchPatient { get; set; }
+    public DateOnly? SearchDate { get; set; }
+
+    public bool HasSearched { get; set; }
+
+    public async Task OnGetAsync(string? searchDoctor, string? searchPatient, DateOnly? searchDate)
+    {
+        _logger.LogInformation("=== SEARCH DEBUG START ===");
+        _logger.LogInformation($"Search Parameters - Doctor: '{searchDoctor}', Patient: '{searchPatient}', Date: '{searchDate}'");
+
+        SearchDoctor = searchDoctor;
+        SearchPatient = searchPatient;
+        SearchDate = searchDate;
+
+        var allAppointments = await _service.GetAllAppointmentsAsync();
+        _logger.LogInformation($"Total appointments from DB: {allAppointments.Count}");
+
+        // Log all appointments and their patient/doctor info
+        foreach (var apt in allAppointments)
+        {
+            _logger.LogInformation($"  Appointment ID: {apt.AppointmentId}");
+            _logger.LogInformation($"    Patient: {apt.Patient?.User?.FirstName} {apt.Patient?.User?.LastName} (ID: {apt.PatientId})");
+            _logger.LogInformation($"    Doctor: {apt.Doctor?.User?.FirstName} {apt.Doctor?.User?.LastName} (ID: {apt.DoctorId})");
+            _logger.LogInformation($"    Date: {apt.AppointmentDate}, Time: {apt.AppointmentTime}, Status: {apt.Status}");
+        }
+
+        // Filter by doctor name
+        if (!string.IsNullOrWhiteSpace(searchDoctor))
+        {
+            _logger.LogInformation($"Filtering by Doctor: '{searchDoctor}'");
+            var lowerDoctor = searchDoctor.ToLower();
+            _logger.LogInformation($"Lower case doctor search: '{lowerDoctor}'");
+
+            allAppointments = allAppointments
+                .Where(a =>
+                {
+                    bool result = a.Doctor != null && a.Doctor.User != null &&
+                             ((a.Doctor.User.FirstName?.ToLower().Contains(lowerDoctor) ?? false)
+                             || (a.Doctor.User.LastName?.ToLower().Contains(lowerDoctor) ?? false));
+
+                    if (a.Doctor?.User != null)
+                    {
+                        _logger.LogInformation($"  Checking doctor '{a.Doctor.User.FirstName} {a.Doctor.User.LastName}' -> Match: {result}");
+                    }
+
+                    return result;
+                })
+                .ToList();
+
+            _logger.LogInformation($"After doctor filter: {allAppointments.Count} appointments");
+            HasSearched = true;
+        }
+
+        // Filter by patient name
+        if (!string.IsNullOrWhiteSpace(searchPatient))
+        {
+            _logger.LogInformation($"Filtering by Patient: '{searchPatient}'");
+            var lowerPatient = searchPatient.ToLower();
+            _logger.LogInformation($"Lower case patient search: '{lowerPatient}'");
+
+            allAppointments = allAppointments
+                .Where(a =>
+                {
+                    bool result = a.Patient != null && a.Patient.User != null &&
+                             ((a.Patient.User.FirstName?.ToLower().Contains(lowerPatient) ?? false)
+                             || (a.Patient.User.LastName?.ToLower().Contains(lowerPatient) ?? false));
+
+                    if (a.Patient?.User != null)
+                    {
+                        _logger.LogInformation($"  Checking patient '{a.Patient.User.FirstName} {a.Patient.User.LastName}' -> Match: {result}");
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"  Appointment {a.AppointmentId} has null Patient or Patient.User");
+                    }
+
+                    return result;
+                })
+                .ToList();
+
+            _logger.LogInformation($"After patient filter: {allAppointments.Count} appointments");
+            HasSearched = true;
+        }
+
+        // Filter by date
+        if (searchDate.HasValue)
+        {
+            _logger.LogInformation($"Filtering by Date: {searchDate.Value}");
+            allAppointments = allAppointments
+                .Where(a => a.AppointmentDate == searchDate.Value)
+                .ToList();
+
+            _logger.LogInformation($"After date filter: {allAppointments.Count} appointments");
+            HasSearched = true;
+        }
+
+        Appointments = allAppointments
+            .OrderByDescending(a => a.AppointmentDate)
+            .ThenByDescending(a => a.AppointmentTime)
+            .ToList();
+
+        _logger.LogInformation($"Final results: {Appointments.Count} appointments");
+        _logger.LogInformation("=== SEARCH DEBUG END ===");
+    }
+}

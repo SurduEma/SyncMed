@@ -1,0 +1,59 @@
+@page
+@model SyncMed.Pages.Specialties.CreateModel
+@{
+    ViewData["Title"] = "Add New Doctor (Specialty)";
+}
+
+<div class="container mt-5">
+    <h2>Add New Doctor</h2>
+    <hr />
+
+    <form method="post">
+        <h4>User Information</h4>
+        <div class="form-group">
+            <label asp-for="Doctor.User.FirstName" class="form-label">First Name</label>
+            <input asp-for="Doctor.User.FirstName" class="form-control" />
+            <span asp-validation-for="Doctor.User.FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <label asp-for="Doctor.User.LastName" class="form-label">Last Name</label>
+            <input asp-for="Doctor.User.LastName" class="form-control" />
+            <span asp-validation-for="Doctor.User.LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <label asp-for="Doctor.User.Email" class="form-label">Email</label>
+            <input asp-for="Doctor.User.Email" class="form-control" type="email" />
+            <span asp-validation-for="Doctor.User.Email" class="text-danger"></span>
+        </div>
+
+        <h4 class="mt-4">Doctor Information</h4>
+        <div class="form-group">
+            <label asp-for="Doctor.Specialty" class="form-label">Specialty</label>
+            <input asp-for="Doctor.Specialty" class="form-control" />
+            <span asp-validation-for="Doctor.Specialty" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <label asp-for="Doctor.DoctorLicenseId" class="form-label">License ID</label>
+            <input asp-for="Doctor.DoctorLicenseId" class="form-control" />
+            <span asp-validation-for="Doctor.DoctorLicenseId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <label asp-for="Doctor.WorkingHours" class="form-label">Working Hours (Optional)</label>
+            <input asp-for="Doctor.WorkingHours" class="form-control" />
+            <span asp-validation-for="Doctor.WorkingHours" class="text-danger"></span>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

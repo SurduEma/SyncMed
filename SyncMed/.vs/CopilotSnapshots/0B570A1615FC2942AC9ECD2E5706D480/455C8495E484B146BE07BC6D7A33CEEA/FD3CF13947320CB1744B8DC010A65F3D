@@ -1,0 +1,80 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SyncMed.Data;
+using SyncMed.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<SyncMedDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var app = builder.Build();
+
+// Seed mock patient and doctor data
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SyncMedDbContext>();
+    db.Database.Migrate();
+
+    if (!db.Patients.Any())
+    {
+        var patientUser = new User
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@example.com",
+            PasswordHash = "mock-hash",
+            Role = "Patient",
+            CreatedAt = DateTime.UtcNow
+        };
+        db.Users.Add(patientUser);
+        db.SaveChanges();
+
+        db.Patients.Add(new Patient
+        {
+            PatientId = patientUser.UserId,
+            DateOfBirth = new DateOnly(1990, 5, 15),
+            PhoneNumber = "555-0100"
+        });
+        db.SaveChanges();
+    }
+
+    if (!db.Doctors.Any())
+    {
+        var doctorUsers = new[]
+        {
+            new User { FirstName = "Alice", LastName = "Smith", Email = "alice.smith@syncmed.com", PasswordHash = "mock-hash", Role = "Doctor", CreatedAt = DateTime.UtcNow },
+            new User { FirstName = "Robert", LastName = "Johnson", Email = "robert.johnson@syncmed.com", PasswordHash = "mock-hash", Role = "Doctor", CreatedAt = DateTime.UtcNow },
+            new User { FirstName = "Maria", LastName = "Garcia", Email = "maria.garcia@syncmed.com", PasswordHash = "mock-hash", Role = "Doctor", CreatedAt = DateTime.UtcNow }
+        };
+        db.Users.AddRange(doctorUsers);
+        db.SaveChanges();
+
+        db.Doctors.AddRange(
+            new Doctor { DoctorId = doctorUsers[0].UserId, Specialty = "Cardiology", DoctorLicenseId = "LIC-001", WorkingHours = "Mon-Fri 09:00-17:00" },
+            new Doctor { DoctorId = doctorUsers[1].UserId, Specialty = "Neurology", DoctorLicenseId = "LIC-002", WorkingHours = "Mon-Fri 08:00-16:00" },
+            new Doctor { DoctorId = doctorUsers[2].UserId, Specialty = "General Practice", DoctorLicenseId = "LIC-003", WorkingHours = "Mon-Sat 10:00-18:00" }
+        );
+        db.SaveChanges();
+    }
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+
+app.MapRazorPages();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();

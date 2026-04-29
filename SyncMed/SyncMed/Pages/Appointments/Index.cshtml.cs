@@ -1,0 +1,111 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SyncMed.Models;
+using SyncMed.Services;
+
+namespace SyncMed.Pages.Appointments;
+
+public class IndexModel : PageModel
+{
+    private readonly IAppointmentService _appointmentService;
+    private readonly IDoctorService _doctorService;
+    private readonly IPatientService _patientService;
+
+    public IndexModel(
+        IAppointmentService appointmentService,
+        IDoctorService doctorService,
+        IPatientService patientService)
+    {
+        _appointmentService = appointmentService;
+        _doctorService = doctorService;
+        _patientService = patientService;
+    }
+
+    public IList<Appointment> Appointments { get; set; } = default!;
+
+    public SelectList DoctorList { get; set; } = default!;
+
+    public List<string> AvailableTimeSlots { get; set; } = new();
+
+    [BindProperty]
+    public int SelectedDoctorId { get; set; }
+
+    [BindProperty]
+    public DateOnly AppointmentDate { get; set; }
+
+    [BindProperty]
+    public TimeOnly AppointmentTime { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    public async Task<JsonResult> OnGetTimeSlots(int doctorId, DateOnly date)
+    {
+        if (doctorId == 0 || date == DateOnly.MinValue)
+        {
+            return new JsonResult(new List<string>());
+        }
+
+        var availableSlots = await _appointmentService.GetAvailableTimeSlotsAsync(doctorId, date);
+        var formattedSlots = availableSlots.Select(t => t.ToString("HH:mm")).ToList();
+
+        return new JsonResult(formattedSlots);
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        // Validate doctor selection
+        if (SelectedDoctorId == 0)
+        {
+            ModelState.AddModelError(nameof(SelectedDoctorId), "Please select a doctor.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await LoadDataAsync();
+            return Page();
+        }
+
+        // Get the first patient (mocked current user)
+        var patients = await _patientService.GetAllPatientsAsync();
+        var patient = patients.FirstOrDefault();
+
+        if (patient == null)
+        {
+            ModelState.AddModelError(string.Empty, "No patient found in the system.");
+            await LoadDataAsync();
+            return Page();
+        }
+
+        // Use the service to book the appointment
+        var (success, message) = await _appointmentService.BookAppointmentAsync(
+            patient.PatientId,
+            SelectedDoctorId,
+            AppointmentDate,
+            AppointmentTime);
+
+        if (!success)
+        {
+            ModelState.AddModelError(string.Empty, message);
+            await LoadDataAsync();
+            return Page();
+        }
+
+        return RedirectToPage();
+    }
+
+    private async Task LoadDataAsync() 
+    {
+        Appointments = await _appointmentService.GetAllAppointmentsAsync();
+
+        var doctors = await _doctorService.GetAllDoctorsAsync();
+
+        DoctorList = new SelectList(
+            doctors.Select(d => new { d.DoctorId, Display = $"Dr. {d.User.FirstName} {d.User.LastName} — {d.Specialty}" }),
+            "DoctorId",
+            "Display");
+    }
+}

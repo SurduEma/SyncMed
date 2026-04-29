@@ -1,0 +1,62 @@
+@page
+@model SyncMed.Pages.Patients.CreateModel
+
+@{
+    ViewData["Title"] = "Add New Patient";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Add New Patient</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Patient.User.FirstName" class="form-label">First Name</label>
+                            <input asp-for="Patient.User.FirstName" class="form-control" placeholder="First name" />
+                            <span asp-validation-for="Patient.User.FirstName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Patient.User.LastName" class="form-label">Last Name</label>
+                            <input asp-for="Patient.User.LastName" class="form-control" placeholder="Last name" />
+                            <span asp-validation-for="Patient.User.LastName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Patient.User.Email" class="form-label">Email</label>
+                            <input asp-for="Patient.User.Email" class="form-control" type="email" placeholder="patient@example.com" />
+                            <span asp-validation-for="Patient.User.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Patient.DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="Patient.DateOfBirth" class="form-control" type="date" />
+                            <span asp-validation-for="Patient.DateOfBirth" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Patient.PhoneNumber" class="form-label">Phone Number (optional)</label>
+                            <input asp-for="Patient.PhoneNumber" class="form-control" placeholder="555-0100" />
+                            <span asp-validation-for="Patient.PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Add Patient
+                            </button>
+                            <a asp-page="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

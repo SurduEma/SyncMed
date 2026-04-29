@@ -1,0 +1,38 @@
+﻿@font-face {
+    font-family: 'Evolventa';
+    src: url('../assets/fonts/Evolventa-Regular-BF63c0b2a7e0a35.woff') format('woff');
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar {
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    font-family: 'Evolventa', Verdana;
+    font-size: large;
+
+    a {
+        text-decoration: none;
+        color: #800021;
+    }
+
+    .navbar-logo {
+        width: 150px;
+    }
+
+    .navbar-middle {
+        display: flex;
+        gap: 70px;
+    }
+
+    .login-btn::before {
+        content: "\1FA7A";
+    }
+}

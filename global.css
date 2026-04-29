@@ -10,7 +10,7 @@
 }
 
 .navbar {
-    background-color: rgb(201, 199, 255);
+    background-color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,10 +18,9 @@
     font-family: 'Evolventa', Verdana;
     font-size: large;
     
-
     a {
         text-decoration: none;
-        color: black;
+        color: #800021;
     }
 
     .navbar-logo {

@@ -1,0 +1,59 @@
+﻿@page
+@model SyncMed.Pages.IndexModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" />
+}
+
+<div class="home-page">
+    <section class="home-welcome-section">
+        <h1>Welcome to SyncMed Clinic</h1>
+        <p>Integrated Medical Care and Appointment Management</p>
+        <p class="home-welcome-description">
+            SyncMed is a modern clinic offering comprehensive medical services across multiple specialties.
+            We streamline your healthcare experience through integrated appointment scheduling, personalized patient guidance, and professional medical expertise.
+            Whether you're seeking specialist care or need information to prepare for your visit, SyncMed is here to support your health journey.
+        </p>
+    </section>
+
+    <section class="home-services-menu">
+        <div class="home-service-item">
+            <div class="home-service-image">
+                <img src="~/assets/home-menu-img/patient-info.jpg" alt="Patient Information" class="service-image-content" />
+            </div>
+            <h2>Patient Information &amp; Guides</h2>
+            <p>Access comprehensive guides and recommendations for different medical conditions. Get insurance information, preparation tips, and expert advice to help you prepare for your appointment and manage your health efficiently.</p>
+            <a href="#" class="home-service-btn">Learn More</a>
+        </div>
+
+        <div class="home-service-item">
+            <div class="home-service-image">
+                <img src="~/assets/home-menu-img/medical-team.jpg" alt="Medical Team" class="service-image-content" />
+            </div>
+            <h2>Our Medical Team</h2>
+            <p>Meet our experienced doctors and healthcare professionals. Learn about their qualifications, specializations, and years of experience. Our diverse team is dedicated to providing you with the highest quality medical care.</p>
+            <a href="#" class="home-service-btn">Meet Our Doctors</a>
+        </div>
+
+        <div class="home-service-item">
+            <div class="home-service-image">
+                <img src="~/assets/home-menu-img/specialties.jpg" alt="Specialties" class="service-image-content" />
+            </div>
+            <h2>Our Specialties</h2>
+            <p>Discover the range of medical services we offer across different specialties. View our doctors by specialty, their work schedules, and the treatments we provide. Find the perfect specialist for your healthcare needs.</p>
+            <a asp-page="/Specialties/Index" class="home-service-btn">View Specialties</a>
+        </div>
+    </section>
+
+    <section class="home-appointment-section">
+        <h2>Ready to Book Your Appointment?</h2>
+        <div class="appointment-buttons">
+            <a asp-page="/Appointments/Index" class="appointment-button">Request Appointment</a>
+            <a href="#" class="appointment-button">Contact Us</a>
+        </div>
+    </section>
+</div>

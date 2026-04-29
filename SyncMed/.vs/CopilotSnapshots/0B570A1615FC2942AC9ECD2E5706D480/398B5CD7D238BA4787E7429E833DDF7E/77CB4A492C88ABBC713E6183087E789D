@@ -1,0 +1,31 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SyncMed.Data;
+using SyncMed.Models;
+
+namespace SyncMed.Pages.Users;
+
+public class DetailsModel : PageModel
+{
+    private readonly SyncMedDbContext _context;
+
+    public DetailsModel(SyncMedDbContext context)
+    {
+        _context = context;
+    }
+
+    public User User { get; set; } = default!;
+
+    public async Task<IActionResult> OnGetAsync(int id)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        User = user;
+        return Page();
+    }
+}

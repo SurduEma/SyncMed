@@ -1,0 +1,80 @@
+@page
+@model SyncMed.Pages.Doctors.IndexModel
+
+@{
+    ViewData["Title"] = "Our Doctors";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Our Doctors</h1>
+            <p class="text-muted">Manage our medical team</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-page="Create" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Add New Doctor
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Doctors.Any())
+    {
+        <div class="alert alert-info">
+            <p class="mb-0">No doctors found. <a asp-page="Create">Add the first one</a></p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var doctor in Model.Doctors)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">Dr. @doctor.User.FirstName @doctor.User.LastName</h5>
+                                    <p class="text-primary fw-bold">@doctor.Specialty</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block">
+                                    <strong>License:</strong> @doctor.DoctorLicenseId
+                                </small>
+                                @if (!string.IsNullOrEmpty(doctor.WorkingHours))
+                                {
+                                    <small class="text-muted d-block">
+                                        <strong>Hours:</strong> @doctor.WorkingHours
+                                    </small>
+                                }
+                                <small class="text-muted d-block">
+                                    <strong>Email:</strong> @doctor.User.Email
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-top">
+                            <a asp-page="Edit" asp-route-id="@doctor.DoctorId" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-page="Delete" asp-route-id="@doctor.DoctorId" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+</style>

@@ -1,0 +1,52 @@
+@page "{id:int}"
+@model SyncMed.Pages.Doctors.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete Doctor";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Delete Doctor</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning!</strong> You are about to delete this doctor permanently.
+                    </div>
+
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <p class="mb-2">
+                            <strong>Dr. @Model.Doctor.User.FirstName @Model.Doctor.User.LastName</strong>
+                        </p>
+                        <p class="mb-2">
+                            <small class="text-muted">@Model.Doctor.Specialty</small>
+                        </p>
+                        <p class="mb-0">
+                            <small class="text-muted">@Model.Doctor.User.Email</small>
+                        </p>
+                    </div>
+
+                    <p class="text-danger small mb-4">
+                        This action cannot be undone. All associated appointments will be affected.
+                    </p>
+
+                    <form method="post">
+                        <input type="hidden" asp-for="Doctor.DoctorId" />
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete Doctor
+                            </button>
+                            <a asp-page="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

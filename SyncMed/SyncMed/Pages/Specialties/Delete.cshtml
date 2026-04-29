@@ -1,0 +1,29 @@
+@page
+@model SyncMed.Pages.Specialties.DeleteModel
+@{
+    ViewData["Title"] = "Delete Doctor (Specialty)";
+}
+
+<div class="container mt-5">
+    <h2>Delete Doctor</h2>
+    <hr />
+
+    <div class="alert alert-danger">
+        <strong>Warning:</strong> Are you sure you want to delete this doctor?
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Doctor Details</h5>
+            <p><strong>Name:</strong> Dr. @Model.Doctor.User.FirstName @Model.Doctor.User.LastName</p>
+            <p><strong>Email:</strong> @Model.Doctor.User.Email</p>
+            <p><strong>Specialty:</strong> @Model.Doctor.Specialty</p>
+            <p><strong>License ID:</strong> @Model.Doctor.DoctorLicenseId</p>
+        </div>
+    </div>
+
+    <form method="post" class="mt-4">
+        <button type="submit" class="btn btn-danger">Delete Doctor</button>
+        <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

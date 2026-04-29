@@ -1,0 +1,30 @@
+@page
+@model SyncMed.Pages.Appointments.DeleteModel
+@{
+    ViewData["Title"] = "Cancel Appointment";
+}
+
+<div class="container mt-5">
+    <h2>Cancel Appointment</h2>
+    <hr />
+
+    <div class="alert alert-warning">
+        <strong>Warning:</strong> Are you sure you want to cancel this appointment?
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Appointment Details</h5>
+            <p><strong>Patient:</strong> @Model.Appointment.Patient.User.FirstName @Model.Appointment.Patient.User.LastName</p>
+            <p><strong>Doctor:</strong> Dr. @Model.Appointment.Doctor.User.FirstName @Model.Appointment.Doctor.User.LastName</p>
+            <p><strong>Date:</strong> @Model.Appointment.AppointmentDate</p>
+            <p><strong>Time:</strong> @Model.Appointment.AppointmentTime</p>
+            <p><strong>Status:</strong> <span class="badge bg-secondary">@Model.Appointment.Status</span></p>
+        </div>
+    </div>
+
+    <form method="post" class="mt-4">
+        <button type="submit" class="btn btn-danger">Cancel Appointment</button>
+        <a asp-page="Index" class="btn btn-secondary">Go Back</a>
+    </form>
+</div>

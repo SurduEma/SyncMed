@@ -1,0 +1,250 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Proiect II NEW\\SyncMed\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\pages\\appointments\\search.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\pages\\appointments\\search.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\pages\\appointments\\search.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\pages\\appointments\\search.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\services\\patientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\services\\patientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\services\\doctorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\services\\doctorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\services\\appointmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\services\\appointmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\data\\repositories\\specialtyrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\data\\repositories\\specialtyrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\data\\repositories\\doctorrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\data\\repositories\\doctorrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\data\\repositories\\patientrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\data\\repositories\\patientrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\data\\repositories\\appointmentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\data\\repositories\\appointmentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\controllers\\appointmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\controllers\\appointmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\pages\\appointments\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\pages\\appointments\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|d:\\proiect ii new\\syncmed\\syncmed\\services\\specialtyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}|SyncMed\\SyncMed.csproj|solutionrelative:syncmed\\services\\specialtyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 12,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "PatientRepository.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\PatientRepository.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Data\\Repositories\\PatientRepository.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\PatientRepository.cs",
+              "RelativeToolTip": "SyncMed\\Data\\Repositories\\PatientRepository.cs",
+              "ViewState": "AgIAAEEAAAAAAAAAAAAAAAUAAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T09:23:18.638Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PatientService.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\PatientService.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Services\\PatientService.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\PatientService.cs",
+              "RelativeToolTip": "SyncMed\\Services\\PatientService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T09:28:11.968Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Pages\\Appointments\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Pages\\Appointments\\Index.cshtml.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Pages\\Appointments\\Index.cshtml.cs",
+              "RelativeToolTip": "SyncMed\\Pages\\Appointments\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T09:42:48.225Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Program.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Program.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Program.cs",
+              "RelativeToolTip": "SyncMed\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T09:50:59.083Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "AppointmentsController.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Controllers\\AppointmentsController.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Controllers\\AppointmentsController.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Controllers\\AppointmentsController.cs",
+              "RelativeToolTip": "SyncMed\\Controllers\\AppointmentsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T11:20:51.082Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AppointmentRepository.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\AppointmentRepository.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Data\\Repositories\\AppointmentRepository.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\AppointmentRepository.cs",
+              "RelativeToolTip": "SyncMed\\Data\\Repositories\\AppointmentRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T11:35:33.049Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "DoctorRepository.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\DoctorRepository.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Data\\Repositories\\DoctorRepository.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\DoctorRepository.cs",
+              "RelativeToolTip": "SyncMed\\Data\\Repositories\\DoctorRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T11:51:04.709Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SpecialtyRepository.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\SpecialtyRepository.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Data\\Repositories\\SpecialtyRepository.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Data\\Repositories\\SpecialtyRepository.cs",
+              "RelativeToolTip": "SyncMed\\Data\\Repositories\\SpecialtyRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T10:13:40.732Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AppointmentService.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\AppointmentService.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Services\\AppointmentService.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\AppointmentService.cs",
+              "RelativeToolTip": "SyncMed\\Services\\AppointmentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T10:13:29.255Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DoctorService.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\DoctorService.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Services\\DoctorService.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\DoctorService.cs",
+              "RelativeToolTip": "SyncMed\\Services\\DoctorService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T11:51:42.368Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SpecialtyService.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\SpecialtyService.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Services\\SpecialtyService.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Services\\SpecialtyService.cs",
+              "RelativeToolTip": "SyncMed\\Services\\SpecialtyService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T10:13:44.246Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Search.cshtml.cs",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Pages\\Appointments\\Search.cshtml.cs",
+              "RelativeDocumentMoniker": "SyncMed\\Pages\\Appointments\\Search.cshtml.cs",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Pages\\Appointments\\Search.cshtml.cs",
+              "RelativeToolTip": "SyncMed\\Pages\\Appointments\\Search.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T11:53:33.735Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Search.cshtml",
+              "DocumentMoniker": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Pages\\Appointments\\Search.cshtml",
+              "RelativeDocumentMoniker": "SyncMed\\Pages\\Appointments\\Search.cshtml",
+              "ToolTip": "D:\\Proiect II NEW\\SyncMed\\SyncMed\\Pages\\Appointments\\Search.cshtml",
+              "RelativeToolTip": "SyncMed\\Pages\\Appointments\\Search.cshtml",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T11:53:28.161Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
