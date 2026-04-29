@@ -19,8 +19,19 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Restore dependencies
-      run: dotnet restore "Proiect II NEW/SyncMed/SyncMed.sln"
-
-    - name: Build Web App
-      run: dotnet build "Proiect II NEW/SyncMed/SyncMed.sln" --no-restore --configuration Release
+    - name: Gaseste si ruleaza proiectul automat
+      run: |
+        # Caută automat orice fișier .sln în tot repository-ul
+        SLN_FILE=$(find . -name "*.sln" | head -n 1)
+        
+        # Verifică dacă a găsit ceva
+        if [ -z "$SLN_FILE" ]; then
+          echo "EROARE: Nu am găsit niciun fișier .sln pe GitHub! Probabil nu a fost urcat din cauza .gitignore."
+          exit 1
+        fi
+        
+        echo "Am găsit proiectul exact aici: $SLN_FILE"
+        
+        # Rulează comenzile direct pe fișierul găsit, indiferent de cale
+        dotnet restore "$SLN_FILE"
+        dotnet build "$SLN_FILE" --no-restore --configuration Release
