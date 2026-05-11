@@ -40,28 +40,20 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var specialties = await _specialtyService.GetAllSpecialtiesAsync();
+        var specialties = SpecialtyMetadata.Keys.ToList();
 
         foreach (var specialty in specialties)
         {
-            if (SpecialtyMetadata.TryGetValue(specialty, out var metadata))
+            var metadata = SpecialtyMetadata[specialty];
+
+            SpecialtiesInfo.Add(new SpecialtyInfo
             {
-                SpecialtiesInfo.Add(new SpecialtyInfo
-                {
-                    Name = specialty,
-                    Description = metadata.description,
-                    ImagePath = $"/assets/specialties-img/{metadata.image}"
-                });
-            }
-            else
-            {
-                SpecialtiesInfo.Add(new SpecialtyInfo
-                {
-                    Name = specialty,
-                    Description = $"Professional {specialty} services and expert medical care.",
-                    ImagePath = "/assets/specialties-img/general.jpg"
-                });
-            }
+                Name = specialty,
+                Description = metadata.description,
+                ImagePath = $"/assets/specialties-img/{metadata.image}"
+            });
         }
+
+        await Task.CompletedTask;
     }
 }
