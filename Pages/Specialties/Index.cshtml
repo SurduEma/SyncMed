@@ -5,119 +5,38 @@
     ViewData["Title"] = "Medical Specialties";
 }
 
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Medical Specialties</h1>
-            <p class="text-muted">Browse our medical specialties and available doctors</p>
-        </div>
-        <div class="col-md-4 text-end">
-            <a asp-page="Create" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus"></i> Add Doctor
-            </a>
-        </div>
+<div class="specialties-page">
+    <div class="specialties-header">
+        <h1>Medical Specialties</h1>
+        <p>Explore our comprehensive range of medical specialties and expert healthcare services</p>
     </div>
 
-    @if (!Model.Specialties.Any())
+    @if (!Model.SpecialtiesInfo.Any())
     {
-        <div class="alert alert-info">
-            <p class="mb-0">No specialties available yet. <a asp-page="Create">Add a doctor</a> to get started.</p>
+        <div class="container mt-5">
+            <div class="alert alert-info">
+                <p class="mb-0">No specialties available yet.</p>
+            </div>
         </div>
     }
     else
     {
-        @foreach (var specialty in Model.Specialties)
-        {
-            var doctorsInSpecialty = Model.DoctorsBySpecialty.ContainsKey(specialty) 
-                ? Model.DoctorsBySpecialty[specialty] 
-                : new List<SyncMed.Models.Doctor>();
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-stethoscope"></i> @specialty (@doctorsInSpecialty.Count)
-                    </h5>
+        <div class="specialties-grid">
+            @foreach (var specialty in Model.SpecialtiesInfo)
+            {
+                <div class="specialty-card">
+                    <div class="specialty-image">
+                        <img src="@specialty.ImagePath" alt="@specialty.Name" />
+                    </div>
+                    <div class="specialty-content">
+                        <h2>@specialty.Name</h2>
+                        <p>@specialty.Description</p>
+                        <a href="/Doctors?specialty=@Uri.EscapeDataString(specialty.Name)" class="btn btn-primary mt-3">
+                            View Doctors <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (!doctorsInSpecialty.Any())
-                    {
-                        <p class="text-muted mb-0"><em>No doctors in this specialty yet.</em></p>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Doctor Name</th>
-                                        <th>License ID</th>
-                                        <th>Email</th>
-                                        <th>Working Hours</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var doctor in doctorsInSpecialty)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <strong>Dr. @doctor.User.FirstName @doctor.User.LastName</strong>
-                                            </td>
-                                            <td>@doctor.DoctorLicenseId</td>
-                                            <td>@doctor.User.Email</td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(doctor.WorkingHours))
-                                                {
-                                                    <small>@doctor.WorkingHours</small>
-                                                }
-                                                else
-                                                {
-                                                    <small class="text-muted">N/A</small>
-                                                }
-                                            </td>
-                                            <td>
-                                                <a asp-page="Edit" asp-route-id="@doctor.DoctorId" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a asp-page="Delete" asp-route-id="@doctor.DoctorId" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
+            }
+        </div>
     }
-</div>
-            <div class="specialty-image">
-                <img src="~/assets/specialties-img/ent.jpg" alt="Otolaryngology (ENT)" />
-            </div>
-            <h2>Otolaryngology (ENT)</h2>
-            <p>Treatment of ear, nose, and throat conditions including hearing loss, sinusitis, and sleep apnea with advanced surgical options.</p>
-            <a href="#" class="specialty-link">Learn about Otolaryngology</a>
-        </div>
-
-        <div class="specialty-card">
-            <div class="specialty-image">
-                <img src="~/assets/specialties-img/psychiatry.jpg" alt="Psychiatry" />
-            </div>
-            <h2>Psychiatry</h2>
-            <p>Mental health services for depression, anxiety, bipolar disorder, and other psychiatric conditions with compassionate, evidence-based care.</p>
-            <a href="#" class="specialty-link">Learn about Psychiatry</a>
-        </div>
-
-        <div class="specialty-card">
-            <div class="specialty-image">
-                <img src="~/assets/specialties-img/urology.jpg" alt="Urology" />
-            </div>
-            <h2>Urology</h2>
-            <p>Specialized treatment of urinary tract and male reproductive system disorders for both men and women.</p>
-            <a href="#" class="specialty-link">Learn about Urology</a>
-        </div>
-    </section>
 </div>
