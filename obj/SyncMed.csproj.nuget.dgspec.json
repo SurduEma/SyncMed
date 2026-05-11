@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Proiect II NEW\\SyncMed.csproj": {}
+    "C:\\SyncMed\\SyncMed\\SyncMed.csproj": {}
   },
   "projects": {
-    "D:\\Proiect II NEW\\SyncMed.csproj": {
+    "C:\\SyncMed\\SyncMed\\SyncMed.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Proiect II NEW\\SyncMed.csproj",
+        "projectUniqueName": "C:\\SyncMed\\SyncMed\\SyncMed.csproj",
         "projectName": "SyncMed",
-        "projectPath": "D:\\Proiect II NEW\\SyncMed.csproj",
-        "packagesPath": "C:\\Users\\Ema\\.nuget\\packages\\",
-        "outputPath": "D:\\Proiect II NEW\\obj\\",
+        "projectPath": "C:\\SyncMed\\SyncMed\\SyncMed.csproj",
+        "packagesPath": "C:\\Users\\Daria\\.nuget\\packages\\",
+        "outputPath": "C:\\SyncMed\\SyncMed\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Ema\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Daria\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
