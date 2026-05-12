@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SyncMed")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1ab430f5efb6d375302923978767000da7d5ef11")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+474d79bc5a5643c65d4bee36c1ff9e1722849a5c")]
 [assembly: System.Reflection.AssemblyProductAttribute("SyncMed")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SyncMed")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

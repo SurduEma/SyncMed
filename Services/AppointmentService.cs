@@ -46,10 +46,6 @@ public class AppointmentService : IAppointmentService
     public async Task<(bool Success, string Message)> BookAppointmentAsync(
         int patientId, int doctorId, DateOnly date, TimeOnly time)
     {
-        // Validate year is 2025 or later
-        if (date.Year < 2025)
-            return (false, "Appointments can only be booked for 2025 or later.");
-
         // Validate date is not in the past
         if (date < DateOnly.FromDateTime(DateTime.Today))
             return (false, "Cannot book appointment in the past.");

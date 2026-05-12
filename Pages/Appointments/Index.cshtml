@@ -9,6 +9,38 @@
     <h1>My Appointments</h1>
     <hr />
 
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Search Appointments</h5>
+        </div>
+        <div class="card-body p-4">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label asp-for="SearchDoctor" class="form-label">Doctor Name</label>
+                        <input asp-for="SearchDoctor" class="form-control" placeholder="e.g., Alice Smith" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="SearchPatient" class="form-label">Patient Name</label>
+                        <input asp-for="SearchPatient" class="form-control" placeholder="e.g., John Doe" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="SearchDate" class="form-label">Date</label>
+                        <input asp-for="SearchDate" class="form-control" type="date" min="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Request a New Appointment</h5>
@@ -28,15 +60,15 @@
 
                     <div class="col-md-3">
                         <label asp-for="AppointmentDate" class="form-label">Date</label>
-                        <input asp-for="AppointmentDate" class="form-control" type="date"
-                               min="@DateOnly.FromDateTime(DateTime.Today.AddYears(DateTime.Today.Year < 2025 ? 2025 - DateTime.Today.Year : 0)).ToString("yyyy-MM-dd")"
+                        <input asp-for="AppointmentDate" asp-format="{0:yyyy-MM-dd}" class="form-control" type="date"
+                               min="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")"
                                id="appointmentDate" />
                         <span asp-validation-for="AppointmentDate" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-3">
                         <label asp-for="AppointmentTime" class="form-label">Time Slot</label>
-                        <input asp-for="AppointmentTime" type="hidden" id="AppointmentTimeHidden" />
+                        <input asp-for="AppointmentTime" asp-format="{0:HH\\:mm}" type="hidden" id="AppointmentTimeHidden" />
                         <select id="timeSlotSelect" class="form-select" disabled>
                             <option value="">-- Select a Time Slot --</option>
                         </select>
@@ -55,7 +87,11 @@
     @if (!Model.Appointments.Any())
     {
         <div class="alert alert-info">
-            <p class="mb-0">You have no appointments scheduled yet. Use the form above to book one.</p>
+            <p class="mb-0">
+                @(Model.HasSearched
+                    ? "No appointments found matching your search criteria."
+                    : "You have no appointments scheduled yet. Use the form above to book one.")
+            </p>
         </div>
     }
     else
@@ -112,6 +148,12 @@
         const timeSlotHidden = document.getElementById('AppointmentTimeHidden');
 
         // Function to fetch and populate time slots
+        function isWeekend(dateValue) {
+            const date = new Date(`${dateValue}T00:00:00`);
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
         async function updateTimeSlots() {
             const doctorId = doctorSelect.value;
             const date = dateInput.value;
@@ -124,10 +166,30 @@
                 return;
             }
 
+            if (isWeekend(date)) {
+                timeSlotSelect.disabled = true;
+                timeSlotSelect.innerHTML = '<option value="">-- Weekends unavailable --</option>';
+                timeSlotHidden.value = '';
+                dateInput.setCustomValidity('Please choose a weekday.');
+                dateInput.reportValidity();
+                return;
+            }
+
+            dateInput.setCustomValidity('');
+
             try {
                 // Fetch available time slots from server
-                const response = await fetch(`?handler=GetTimeSlots&doctorId=${doctorId}&date=${date}`);
-                const slots = await response.json();
+                const response = await fetch(`?handler=TimeSlots&doctorId=${doctorId}&date=${date}`);
+                if (!response.ok) {
+                    console.error('Time slots request failed:', response.status, response.statusText);
+                }
+                const text = await response.text();
+                let slots = [];
+                try {
+                    slots = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Failed to parse time slots response:', parseError, text);
+                }
 
                 // Populate time slot dropdown
                 timeSlotSelect.innerHTML = '<option value="">-- Select a Time Slot --</option>';
@@ -139,6 +201,10 @@
                 });
 
                 timeSlotSelect.disabled = slots.length === 0;
+
+                if (timeSlotHidden.value) {
+                    timeSlotSelect.value = timeSlotHidden.value;
+                }
 
                 if (slots.length === 0) {
                     const option = document.createElement('option');
@@ -154,7 +220,20 @@
 
         // Update time slots when doctor or date changes
         doctorSelect.addEventListener('change', updateTimeSlots);
-        dateInput.addEventListener('change', updateTimeSlots);
+        dateInput.addEventListener('change', function () {
+            if (dateInput.value && isWeekend(dateInput.value)) {
+                dateInput.value = '';
+                dateInput.setCustomValidity('Please choose a weekday.');
+                dateInput.reportValidity();
+                timeSlotSelect.disabled = true;
+                timeSlotSelect.innerHTML = '<option value="">-- Weekends unavailable --</option>';
+                timeSlotHidden.value = '';
+                return;
+            }
+
+            dateInput.setCustomValidity('');
+            updateTimeSlots();
+        });
 
         // Update hidden field when time slot selection changes
         timeSlotSelect.addEventListener('change', function() {
