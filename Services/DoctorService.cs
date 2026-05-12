@@ -48,7 +48,18 @@ public class DoctorService : IDoctorService
         if (existingDoctor == null)
             throw new InvalidOperationException("Doctor not found.");
 
-        await _repository.UpdateAsync(doctor);
+        existingDoctor.Specialty = doctor.Specialty;
+        existingDoctor.DoctorLicenseId = doctor.DoctorLicenseId;
+        existingDoctor.WorkingHours = doctor.WorkingHours;
+
+        if (existingDoctor.User != null && doctor.User != null)
+        {
+            existingDoctor.User.FirstName = doctor.User.FirstName;
+            existingDoctor.User.LastName = doctor.User.LastName;
+            existingDoctor.User.Email = doctor.User.Email;
+        }
+
+        await _repository.UpdateAsync(existingDoctor);
     }
 
     public async Task DeleteDoctorAsync(int id)
