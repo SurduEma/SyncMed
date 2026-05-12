@@ -105,7 +105,13 @@ public class AppointmentService : IAppointmentService
         if (existingAppointment == null)
             throw new InvalidOperationException("Appointment not found.");
 
-        await _appointmentRepository.UpdateAsync(appointment);
+        existingAppointment.PatientId = appointment.PatientId;
+        existingAppointment.DoctorId = appointment.DoctorId;
+        existingAppointment.AppointmentDate = appointment.AppointmentDate;
+        existingAppointment.AppointmentTime = appointment.AppointmentTime;
+        existingAppointment.Status = appointment.Status;
+
+        await _appointmentRepository.UpdateAsync(existingAppointment);
     }
 
     public async Task<(bool Success, string Message)> CancelAppointmentAsync(int appointmentId)
