@@ -16,12 +16,14 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<ISpecialtyRepository, SpecialtyRepository>();
+builder.Services.AddScoped<IMedicalServiceRepository, MedicalServiceRepository>();
 
 // Register Services
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
+builder.Services.AddScoped<IMedicalServiceModelService, MedicalServiceModelService>();
 
 var app = builder.Build();
 

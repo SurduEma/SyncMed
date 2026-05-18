@@ -35,10 +35,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwb2ludG1lbnRzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Dani/Desktop/SyncMed/Pages/Appointments/Search.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwb2ludG1lbnRzXFNlYXJjaC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/Dani/Desktop/SyncMed/Pages/Doctors/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRG9jdG9yc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -101,24 +97,4 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Dani/Desktop/SyncMed/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Dani/Desktop/SyncMed/Views/Appointments/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXBwb2ludG1lbnRzXERldGFpbHMuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Dani/Desktop/SyncMed/Views/Appointments/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXBwb2ludG1lbnRzXEluZGV4LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Dani/Desktop/SyncMed/Views/Shared/_Layout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Dani/Desktop/SyncMed/Views/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Dani/Desktop/SyncMed/Views/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

@@ -18,6 +18,7 @@ public class SyncMedDbContext : DbContext
     public DbSet<Consultation> Consultations => Set<Consultation>();
     public DbSet<Prescription> Prescriptions => Set<Prescription>();
     public DbSet<TestResult> TestResults => Set<TestResult>();
+    public DbSet<MedicalService> MedicalServices => Set<MedicalService>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
