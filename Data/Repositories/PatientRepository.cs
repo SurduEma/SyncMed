@@ -44,8 +44,17 @@ public class PatientRepository : IPatientRepository
             .Include(p => p.Appointments)
                 .ThenInclude(a => a.Doctor)
                     .ThenInclude(d => d.User)
+            .Include(p => p.Appointments)
+                .ThenInclude(a => a.Consultation)
             .Include(p => p.Prescriptions)
+                .ThenInclude(pr => pr.Doctor)
+                    .ThenInclude(d => d.User)
+            .Include(p => p.Prescriptions)
+                .ThenInclude(pr => pr.DraftedByNurse)
+                    .ThenInclude(n => n!.User)
             .Include(p => p.TestResults)
+                .ThenInclude(t => t.UploadedByDoctor)
+                    .ThenInclude(d => d.User)
             .FirstOrDefaultAsync(p => p.PatientId == id);
     }
 

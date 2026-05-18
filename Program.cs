@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SyncMed.Authorization;
 using SyncMed.Data;
 using SyncMed.Data.Repositories;
 using SyncMed.Models;
@@ -7,11 +10,32 @@ using SyncMed.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AppPolicies.AdminOnly, policy => policy.RequireRole(AppRoles.Admin));
+    options.AddPolicy(AppPolicies.PatientOrAdmin, policy => policy.RequireRole(AppRoles.Patient, AppRoles.Admin));
+    options.AddPolicy(AppPolicies.DoctorOrAdmin, policy => policy.RequireRole(AppRoles.Doctor, AppRoles.Admin));
+    options.AddPolicy(AppPolicies.NurseOrAdmin, policy => policy.RequireRole(AppRoles.Nurse, AppRoles.Admin));
+    options.AddPolicy(AppPolicies.StaffOrAdmin, policy => policy.RequireRole(AppRoles.Doctor, AppRoles.Nurse, AppRoles.Admin));
+    options.AddPolicy(AppPolicies.AnyAuthenticatedRole, policy => policy.RequireRole(AppRoles.Patient, AppRoles.Doctor, AppRoles.Nurse, AppRoles.Admin));
+});
 
 builder.Services.AddDbContext<SyncMedDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
@@ -19,61 +43,57 @@ builder.Services.AddScoped<ISpecialtyRepository, SpecialtyRepository>();
 builder.Services.AddScoped<IMedicalServiceRepository, MedicalServiceRepository>();
 
 // Register Services
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
 builder.Services.AddScoped<IMedicalServiceModelService, MedicalServiceModelService>();
+builder.Services.AddScoped<IAppointmentNotificationService, AppointmentNotificationService>();
+builder.Services.AddScoped<IClinicalRecordService, ClinicalRecordService>();
 
-var app = builder.Build();
+WebApplication app;
+try
+{
+    app = builder.Build();
+}
+catch (Exception ex)
+{
+    // Log the exception to console to help debugging during development
+    Console.Error.WriteLine("Application build failed: " + ex);
+    // Rethrow so the host will surface the original error to the debugger
+    throw;
+}
 
-// Seed mock patient and doctor data
+// Seed demo accounts and baseline catalog data.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<SyncMedDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
+
     db.Database.Migrate();
 
-    if (!db.Patients.Any())
-    {
-        var patientUser = new User
-        {
-            FirstName = "John",
-            LastName = "Doe",
-            Email = "john.doe@example.com",
-            PasswordHash = "mock-hash",
-            Role = "Patient",
-            CreatedAt = DateTime.UtcNow
-        };
-        db.Users.Add(patientUser);
-        db.SaveChanges();
+    var admin = EnsureUser(db, passwordHasher, "System", "Admin", "admin@syncmed.com", AppRoles.Admin, "Admin123!");
+    var patient = EnsureUser(db, passwordHasher, "John", "Doe", "john.doe@example.com", AppRoles.Patient, "Patient123!");
+    EnsurePatient(db, patient, new DateOnly(1990, 5, 15), "555-0100");
 
-        db.Patients.Add(new Patient
-        {
-            PatientId = patientUser.UserId,
-            DateOfBirth = new DateOnly(1990, 5, 15),
-            PhoneNumber = "555-0100"
-        });
-        db.SaveChanges();
-    }
+    var nurse = EnsureUser(db, passwordHasher, "Nora", "Williams", "nora.williams@syncmed.com", AppRoles.Nurse, "Nurse123!");
+    EnsureNurse(db, nurse, "NUR-001");
 
-    if (!db.Doctors.Any())
-    {
-        var doctorUsers = new[]
-        {
-            new User { FirstName = "Alice", LastName = "Smith", Email = "alice.smith@syncmed.com", PasswordHash = "mock-hash", Role = "Doctor", CreatedAt = DateTime.UtcNow },
-            new User { FirstName = "Robert", LastName = "Johnson", Email = "robert.johnson@syncmed.com", PasswordHash = "mock-hash", Role = "Doctor", CreatedAt = DateTime.UtcNow },
-            new User { FirstName = "Maria", LastName = "Garcia", Email = "maria.garcia@syncmed.com", PasswordHash = "mock-hash", Role = "Doctor", CreatedAt = DateTime.UtcNow }
-        };
-        db.Users.AddRange(doctorUsers);
-        db.SaveChanges();
+    var alice = EnsureUser(db, passwordHasher, "Alice", "Smith", "alice.smith@syncmed.com", AppRoles.Doctor, "Doctor123!");
+    EnsureDoctor(db, alice, "Cardiology", "LIC-001", "Mon-Fri 09:00-17:00");
 
-        db.Doctors.AddRange(
-            new Doctor { DoctorId = doctorUsers[0].UserId, Specialty = "Cardiology", DoctorLicenseId = "LIC-001", WorkingHours = "Mon-Fri 09:00-17:00" },
-            new Doctor { DoctorId = doctorUsers[1].UserId, Specialty = "Neurology", DoctorLicenseId = "LIC-002", WorkingHours = "Mon-Fri 08:00-16:00" },
-            new Doctor { DoctorId = doctorUsers[2].UserId, Specialty = "General Practice", DoctorLicenseId = "LIC-003", WorkingHours = "Mon-Sat 10:00-18:00" }
-        );
-        db.SaveChanges();
-    }
+    var robert = EnsureUser(db, passwordHasher, "Robert", "Johnson", "robert.johnson@syncmed.com", AppRoles.Doctor, "Doctor123!");
+    EnsureDoctor(db, robert, "Neurology", "LIC-002", "Mon-Fri 08:00-16:00");
+
+    var maria = EnsureUser(db, passwordHasher, "Maria", "Garcia", "maria.garcia@syncmed.com", AppRoles.Doctor, "Doctor123!");
+    EnsureDoctor(db, maria, "General Practice", "LIC-003", "Mon-Fri 10:00-18:00");
+
+    EnsureMedicalServices(db);
+
+    _ = admin;
+    db.SaveChanges();
 }
 
 if (!app.Environment.IsDevelopment())
@@ -85,8 +105,110 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 
 app.Run();
+
+static User EnsureUser(
+    SyncMedDbContext db,
+    IPasswordHasher<User> passwordHasher,
+    string firstName,
+    string lastName,
+    string email,
+    string role,
+    string password)
+{
+    var user = db.Users.FirstOrDefault(u => u.Email == email);
+    if (user == null)
+    {
+        user = new User
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Role = role,
+            CreatedAt = DateTime.UtcNow
+        };
+        user.PasswordHash = passwordHasher.HashPassword(user, password);
+        db.Users.Add(user);
+        db.SaveChanges();
+        return user;
+    }
+
+    user.FirstName = firstName;
+    user.LastName = lastName;
+    user.Role = role;
+    user.PasswordHash = passwordHasher.HashPassword(user, password);
+    db.SaveChanges();
+    return user;
+}
+
+static void EnsurePatient(SyncMedDbContext db, User user, DateOnly dateOfBirth, string phoneNumber)
+{
+    var patient = db.Patients.FirstOrDefault(p => p.PatientId == user.UserId);
+    if (patient == null)
+    {
+        db.Patients.Add(new Patient
+        {
+            PatientId = user.UserId,
+            DateOfBirth = dateOfBirth,
+            PhoneNumber = phoneNumber
+        });
+        return;
+    }
+
+    patient.DateOfBirth = dateOfBirth;
+    patient.PhoneNumber = phoneNumber;
+}
+
+static void EnsureDoctor(SyncMedDbContext db, User user, string specialty, string licenseId, string workingHours)
+{
+    var doctor = db.Doctors.FirstOrDefault(d => d.DoctorId == user.UserId);
+    if (doctor == null)
+    {
+        db.Doctors.Add(new Doctor
+        {
+            DoctorId = user.UserId,
+            Specialty = specialty,
+            DoctorLicenseId = licenseId,
+            WorkingHours = workingHours
+        });
+        return;
+    }
+
+    doctor.Specialty = specialty;
+    doctor.DoctorLicenseId = licenseId;
+    doctor.WorkingHours = workingHours;
+}
+
+static void EnsureNurse(SyncMedDbContext db, User user, string licenseId)
+{
+    var nurse = db.Nurses.FirstOrDefault(n => n.NurseId == user.UserId);
+    if (nurse == null)
+    {
+        db.Nurses.Add(new Nurse
+        {
+            NurseId = user.UserId,
+            NurseLicenseId = licenseId
+        });
+        return;
+    }
+
+    nurse.NurseLicenseId = licenseId;
+}
+
+static void EnsureMedicalServices(SyncMedDbContext db)
+{
+    if (db.MedicalServices.Any())
+        return;
+
+    db.MedicalServices.AddRange(
+        new MedicalService { Specialty = "General Practice", Name = "General Consultation", Description = "Primary care consultation and care plan.", Price = 80 },
+        new MedicalService { Specialty = "Cardiology", Name = "Cardiac Evaluation", Description = "Heart health review and cardiovascular assessment.", Price = 160 },
+        new MedicalService { Specialty = "Neurology", Name = "Neurology Consultation", Description = "Assessment for nervous system symptoms and conditions.", Price = 170 },
+        new MedicalService { Specialty = "Pediatrics", Name = "Pediatric Checkup", Description = "Preventive visit for children and adolescents.", Price = 95 }
+    );
+}

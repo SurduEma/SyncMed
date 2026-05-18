@@ -34,6 +34,12 @@
                             <span asp-validation-for="Doctor.User.Email" class="text-danger small"></span>
                         </div>
 
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Temporary Password</label>
+                            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
                         <h5 class="mb-3 mt-4 text-primary">Doctor Information</h5>
                         <div class="mb-3">
                             <label asp-for="Doctor.Specialty" class="form-label">Specialty</label>

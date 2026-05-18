@@ -27,18 +27,50 @@
                     <li class="nav-item"><a asp-page="/Index" class="nav-link">Home</a></li>
                     <li class="nav-item"><a asp-page="/Specialties/Index" class="nav-link">Specialties</a></li>
                     <li class="nav-item"><a asp-page="/Services/Index" class="nav-link">Services</a></li>
-                    <li class="nav-item"><a asp-page="/Appointments/Index" class="nav-link">Appointments</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="managementDropdown" role="button" data-bs-toggle="dropdown">
-                            Management
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="managementDropdown">
-                            <li><a asp-page="/Doctors/Index" class="dropdown-item">Doctors</a></li>
-                            <li><a asp-page="/Patients/Index" class="dropdown-item">Patients</a></li>
-                        </ul>
-                    </li>
+                    <li class="nav-item"><a asp-page="/Doctors/Index" class="nav-link">Doctors</a></li>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item"><a asp-page="/Appointments/Index" class="nav-link">Appointments</a></li>
+                        <li class="nav-item"><a asp-page="/Prescriptions/Index" class="nav-link">Prescriptions</a></li>
+                        @if (User.IsInRole(AppRoles.Patient))
+                        {
+                            <li class="nav-item">
+                                <a asp-page="/Patients/Details" asp-route-id="@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)" class="nav-link">My Record</a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole(AppRoles.Admin) || User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Nurse))
+                        {
+                            <li class="nav-item"><a asp-page="/Patients/Index" class="nav-link">Patients</a></li>
+                        }
+
+                        @if (User.IsInRole(AppRoles.Admin))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="managementDropdown" role="button" data-bs-toggle="dropdown">
+                                    Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="managementDropdown">
+                                    <li><a asp-page="/Doctors/Create" class="dropdown-item">Add Doctor</a></li>
+                                    <li><a asp-page="/Services/Create" class="dropdown-item">Add Service</a></li>
+                                    <li><a asp-page="/Patients/Create" class="dropdown-item">Add Patient</a></li>
+                                </ul>
+                            </li>
+                        }
+                    }
                 </ul>
-                <a href="#" class="nav-link ms-3">Log In</a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="navbar-text ms-3">@User.Identity.Name</span>
+                    <form method="post" asp-page="/Account/Logout" class="ms-3">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Log Out</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-page="/Account/Login" class="nav-link ms-3">Log In</a>
+                    <a asp-page="/Account/Register" class="btn btn-primary btn-sm ms-2">Register</a>
+                }
             </div>
         </div>
     </nav>

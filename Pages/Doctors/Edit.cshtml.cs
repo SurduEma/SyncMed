@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SyncMed.Authorization;
 using SyncMed.Models;
 using SyncMed.Services;
 
 namespace SyncMed.Pages.Doctors;
 
+[Authorize(Roles = AppRoles.AdminOnly)]
 public class EditModel : PageModel
 {
     private readonly IDoctorService _service;

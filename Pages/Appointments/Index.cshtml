@@ -21,10 +21,13 @@
                         <input asp-for="SearchDoctor" class="form-control" placeholder="e.g., Alice Smith" />
                     </div>
 
-                    <div class="col-md-3">
-                        <label asp-for="SearchPatient" class="form-label">Patient Name</label>
-                        <input asp-for="SearchPatient" class="form-control" placeholder="e.g., John Doe" />
-                    </div>
+                    @if (Model.CanSearchPatient)
+                    {
+                        <div class="col-md-3">
+                            <label asp-for="SearchPatient" class="form-label">Patient Name</label>
+                            <input asp-for="SearchPatient" class="form-control" placeholder="e.g., John Doe" />
+                        </div>
+                    }
 
                     <div class="col-md-3">
                         <label asp-for="SearchDate" class="form-label">Date</label>
@@ -41,6 +44,8 @@
         </div>
     </div>
 
+    @if (Model.CanBookAppointments)
+    {
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Request a New Appointment</h5>
@@ -50,6 +55,17 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="row g-3">
+                    @if (Model.CanChoosePatient)
+                    {
+                        <div class="col-md-3">
+                            <label asp-for="SelectedPatientId" class="form-label">Patient</label>
+                            <select asp-for="SelectedPatientId" asp-items="Model.PatientList" class="form-select">
+                                <option value="">-- Select a Patient --</option>
+                            </select>
+                            <span asp-validation-for="SelectedPatientId" class="text-danger"></span>
+                        </div>
+                    }
+
                     <div class="col-md-4">
                         <label asp-for="SelectedDoctorId" class="form-label">Doctor</label>
                         <select asp-for="SelectedDoctorId" asp-items="Model.DoctorList" class="form-select">
@@ -73,7 +89,7 @@
                             <option value="">-- Select a Time Slot --</option>
                         </select>
                         <span asp-validation-for="AppointmentTime" class="text-danger"></span>
-                        <small class="form-text text-muted">Available from 9:00 AM to 8:00 PM (30-min slots)</small>
+                            <small class="form-text text-muted">Available slots follow the selected doctor's working hours.</small>
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
@@ -83,6 +99,7 @@
             </form>
         </div>
     </div>
+    }
 
     @if (!Model.Appointments.Any())
     {
@@ -101,6 +118,10 @@
                 <tr>
                     <th>Date</th>
                     <th>Time</th>
+                    @if (!User.IsInRole(AppRoles.Patient))
+                    {
+                        <th>Patient</th>
+                    }
                     <th>Doctor</th>
                     <th>Specialty</th>
                     <th>Status</th>
@@ -112,7 +133,15 @@
                 {
                     <tr>
                         <td>@appointment.AppointmentDate.ToString("dd MMM yyyy")</td>
-                        <td>@appointment.AppointmentTime.ToString("HH:mm") – @appointment.AppointmentTime.Add(TimeSpan.FromMinutes(30)).ToString("HH:mm")</td>
+                        <td>@appointment.AppointmentTime.ToString("HH:mm") - @appointment.AppointmentTime.Add(TimeSpan.FromMinutes(30)).ToString("HH:mm")</td>
+                        @if (!User.IsInRole(AppRoles.Patient))
+                        {
+                            <td>
+                                <a asp-page="/Patients/Details" asp-route-id="@appointment.PatientId">
+                                    @appointment.Patient.User.FirstName @appointment.Patient.User.LastName
+                                </a>
+                            </td>
+                        }
                         <td>Dr. @appointment.Doctor.User.FirstName @appointment.Doctor.User.LastName</td>
                         <td>@appointment.Doctor.Specialty</td>
                         <td>
@@ -129,8 +158,18 @@
                         <td>
                             @if (appointment.Status != "Cancelled")
                             {
-                                <a asp-page="Edit" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-warning">Edit</a>
-                                <a asp-page="Delete" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-danger">Cancel</a>
+                                @if (User.IsInRole(AppRoles.Admin))
+                                {
+                                    <a asp-page="Edit" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-warning">Edit</a>
+                                }
+                                @if (User.IsInRole(AppRoles.Admin) || User.IsInRole(AppRoles.Patient))
+                                {
+                                    <a asp-page="Delete" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-danger">Cancel</a>
+                                }
+                                @if (User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Nurse) || User.IsInRole(AppRoles.Admin))
+                                {
+                                    <a asp-page="/Patients/Details" asp-route-id="@appointment.PatientId" class="btn btn-sm btn-info">Record</a>
+                                }
                             }
                         </td>
                     </tr>
@@ -146,6 +185,10 @@
         const dateInput = document.getElementById('appointmentDate');
         const timeSlotSelect = document.getElementById('timeSlotSelect');
         const timeSlotHidden = document.getElementById('AppointmentTimeHidden');
+
+        if (!doctorSelect || !dateInput || !timeSlotSelect || !timeSlotHidden) {
+            return;
+        }
 
         // Function to fetch and populate time slots
         function isWeekend(dateValue) {

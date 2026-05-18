@@ -1,12 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using SyncMed.Authorization;
+using SyncMed.Extensions;
 using SyncMed.Models;
 using SyncMed.Services;
 
 namespace SyncMed.Pages.Appointments;
 
+[Authorize(Roles = AppRoles.AnyAuthenticatedRole)]
 public class IndexModel : PageModel
 {
     private readonly IAppointmentService _appointmentService;
@@ -29,11 +33,19 @@ public class IndexModel : PageModel
     public IList<Appointment> Appointments { get; set; } = default!;
 
     public SelectList DoctorList { get; set; } = default!;
+    public SelectList PatientList { get; set; } = default!;
 
     public List<string> AvailableTimeSlots { get; set; } = new();
 
+    public bool CanBookAppointments { get; set; }
+    public bool CanChoosePatient { get; set; }
+    public bool CanSearchPatient { get; set; }
+
     [BindProperty]
     public int SelectedDoctorId { get; set; }
+
+    [BindProperty]
+    public int SelectedPatientId { get; set; }
 
     [BindProperty]
     public DateOnly? AppointmentDate { get; set; }
@@ -94,6 +106,28 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        CanBookAppointments = User.IsInRole(AppRoles.Patient) || User.IsInRole(AppRoles.Admin);
+        CanChoosePatient = User.IsInRole(AppRoles.Admin);
+
+        if (!CanBookAppointments)
+            return Forbid();
+
+        var currentUserId = User.GetUserId();
+        var patientId = currentUserId ?? 0;
+
+        if (User.IsInRole(AppRoles.Admin))
+        {
+            patientId = SelectedPatientId;
+            if (SelectedPatientId == 0)
+            {
+                ModelState.AddModelError(nameof(SelectedPatientId), "Please select a patient.");
+            }
+        }
+        else if (!User.IsInRole(AppRoles.Patient))
+        {
+            return Forbid();
+        }
+
         // Validate doctor selection
         if (SelectedDoctorId == 0)
         {
@@ -134,20 +168,17 @@ public class IndexModel : PageModel
             return Page();
         }
 
-        // Get the first patient (mocked current user)
-        var patients = await _patientService.GetAllPatientsAsync();
-        var patient = patients.FirstOrDefault();
-
+        var patient = await _patientService.GetPatientByIdAsync(patientId);
         if (patient == null)
         {
-            ModelState.AddModelError(string.Empty, "No patient found in the system.");
+            ModelState.AddModelError(string.Empty, "No patient profile found for this account.");
             await LoadDataAsync();
             return Page();
         }
 
         // Use the service to book the appointment
         var (success, message) = await _appointmentService.BookAppointmentAsync(
-            patient.PatientId,
+            patientId,
             SelectedDoctorId,
             AppointmentDate.Value,
             AppointmentTime.Value);
@@ -164,7 +195,25 @@ public class IndexModel : PageModel
 
     private async Task LoadDataAsync() 
     {
+        var currentUserId = User.GetUserId();
+        CanBookAppointments = User.IsInRole(AppRoles.Patient) || User.IsInRole(AppRoles.Admin);
+        CanChoosePatient = User.IsInRole(AppRoles.Admin);
+        CanSearchPatient = User.IsInRole(AppRoles.Admin) || User.IsInRole(AppRoles.Nurse);
+
         var allAppointments = await _appointmentService.GetAllAppointmentsAsync();
+
+        if (User.IsInRole(AppRoles.Patient))
+        {
+            allAppointments = allAppointments
+                .Where(a => a.PatientId == currentUserId)
+                .ToList();
+        }
+        else if (User.IsInRole(AppRoles.Doctor))
+        {
+            allAppointments = allAppointments
+                .Where(a => a.DoctorId == currentUserId)
+                .ToList();
+        }
 
         if (!string.IsNullOrWhiteSpace(SearchDoctor))
         {
@@ -178,7 +227,7 @@ public class IndexModel : PageModel
             HasSearched = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(SearchPatient))
+        if (CanSearchPatient && !string.IsNullOrWhiteSpace(SearchPatient))
         {
             var lowerPatient = SearchPatient.ToLowerInvariant();
             allAppointments = allAppointments
@@ -206,8 +255,14 @@ public class IndexModel : PageModel
         var doctors = await _doctorService.GetAllDoctorsAsync();
 
         DoctorList = new SelectList(
-            doctors.Select(d => new { d.DoctorId, Display = $"Dr. {d.User.FirstName} {d.User.LastName} — {d.Specialty}" }),
+            doctors.Select(d => new { d.DoctorId, Display = $"Dr. {d.User.FirstName} {d.User.LastName} - {d.Specialty}" }),
             "DoctorId",
+            "Display");
+
+        var patients = await _patientService.GetAllPatientsAsync();
+        PatientList = new SelectList(
+            patients.Select(p => new { p.PatientId, Display = $"{p.User.FirstName} {p.User.LastName}" }),
+            "PatientId",
             "Display");
     }
 }

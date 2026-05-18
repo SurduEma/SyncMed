@@ -1,22 +1,32 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SyncMed.Authorization;
 using SyncMed.Models;
 using SyncMed.Services;
 
 namespace SyncMed.Pages.Doctors;
 
+[Authorize(Roles = AppRoles.AdminOnly)]
 public class CreateModel : PageModel
 {
     private readonly IDoctorService _service;
+    private readonly IUserAccountService _userAccountService;
 
-    public CreateModel(IDoctorService service)
+    public CreateModel(IDoctorService service, IUserAccountService userAccountService)
     {
         _service = service;
+        _userAccountService = userAccountService;
     }
 
     [BindProperty]
     public Doctor Doctor { get; set; } = default!;
+
+    [BindProperty]
+    [Required, DataType(DataType.Password), MinLength(8)]
+    public string Password { get; set; } = string.Empty;
 
     public SelectList Specialties { get; set; } = default!;
 
@@ -42,8 +52,8 @@ public class CreateModel : PageModel
         {
             // Create user first
             var user = Doctor.User;
-            user.PasswordHash = "temp-hash";
-            user.Role = "Doctor";
+            user.PasswordHash = _userAccountService.HashPassword(user, Password);
+            user.Role = AppRoles.Doctor;
             user.CreatedAt = DateTime.UtcNow;
 
             await _service.AddDoctorAsync(Doctor);

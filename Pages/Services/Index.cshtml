@@ -11,11 +11,14 @@
             <h1>Our Services</h1>
             <p class="text-muted">Manage available medical services and their pricing</p>
         </div>
-        <div class="col-md-4 text-end">
-            <a asp-page="Create" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus"></i> Add New Service
-            </a>
-        </div>
+        @if (User.IsInRole(AppRoles.Admin))
+        {
+            <div class="col-md-4 text-end">
+                <a asp-page="Create" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Add New Service
+                </a>
+            </div>
+        }
     </div>
 
     <form method="get" class="mb-4">
@@ -31,7 +34,13 @@
     @if (!Model.Services.Any())
     {
         <div class="alert alert-info">
-            <p class="mb-0">No services found for this specialty. <a asp-page="Create">Add the first one</a></p>
+            <p class="mb-0">
+                No services found for this specialty.
+                @if (User.IsInRole(AppRoles.Admin))
+                {
+                    <a asp-page="Create">Add the first one</a>
+                }
+            </p>
         </div>
     }
     else
@@ -43,7 +52,10 @@
                         <th>Name</th>
                         <th>Description</th>
                         <th>Price</th>
-                        <th class="text-end">Actions</th>
+                        @if (User.IsInRole(AppRoles.Admin))
+                        {
+                            <th class="text-end">Actions</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -53,14 +65,17 @@
                             <td class="fw-bold">@service.Name</td>
                             <td>@service.Description</td>
                             <td>@service.Price.ToString("C")</td>
-                            <td class="text-end">
-                                <a asp-page="Edit" asp-route-id="@service.MedicalServiceId" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a asp-page="Delete" asp-route-id="@service.MedicalServiceId" class="btn btn-sm btn-danger ms-1">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
-                            </td>
+                            @if (User.IsInRole(AppRoles.Admin))
+                            {
+                                <td class="text-end">
+                                    <a asp-page="Edit" asp-route-id="@service.MedicalServiceId" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a asp-page="Delete" asp-route-id="@service.MedicalServiceId" class="btn btn-sm btn-danger ms-1">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>

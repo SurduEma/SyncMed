@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SyncMed.Authorization;
 using SyncMed.Models;
 using SyncMed.Services;
 
 namespace SyncMed.Pages.Services;
 
+[Authorize(Roles = AppRoles.AdminOnly)]
 public class DeleteModel : PageModel
 {
     private readonly IMedicalServiceModelService _service;

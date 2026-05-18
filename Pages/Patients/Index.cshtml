@@ -11,11 +11,14 @@
             <h1>Patients</h1>
             <p class="text-muted">Manage patient records</p>
         </div>
-        <div class="col-md-4 text-end">
-            <a asp-page="Create" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus"></i> Add New Patient
-            </a>
-        </div>
+        @if (User.IsInRole(AppRoles.Admin))
+        {
+            <div class="col-md-4 text-end">
+                <a asp-page="Create" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Add New Patient
+                </a>
+            </div>
+        }
     </div>
 
     <form method="get" class="mb-4">
@@ -32,7 +35,13 @@
     @if (!Model.Patients.Any())
     {
         <div class="alert alert-info">
-            <p class="mb-0">No patients found. <a asp-page="Create">Add the first one</a></p>
+            <p class="mb-0">
+                No patients found.
+                @if (User.IsInRole(AppRoles.Admin))
+                {
+                    <a asp-page="Create">Add the first one</a>
+                }
+            </p>
         </div>
     }
     else
@@ -62,12 +71,15 @@
                                 <a asp-page="Details" asp-route-id="@patient.PatientId" class="btn btn-sm btn-info" title="View Profile">
                                     <i class="fas fa-user-md"></i> View Profile
                                 </a>
-                                <a asp-page="Edit" asp-route-id="@patient.PatientId" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a asp-page="Delete" asp-route-id="@patient.PatientId" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                @if (User.IsInRole(AppRoles.Admin))
+                                {
+                                    <a asp-page="Edit" asp-route-id="@patient.PatientId" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-page="Delete" asp-route-id="@patient.PatientId" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }
