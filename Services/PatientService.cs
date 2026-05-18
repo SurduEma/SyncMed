@@ -7,6 +7,7 @@ public interface IPatientService
 {
     Task<IList<Patient>> GetAllPatientsAsync();
     Task<Patient?> GetPatientByIdAsync(int id);
+    Task<Patient?> GetPatientDetailsAsync(int id);
     Task AddPatientAsync(Patient patient);
     Task UpdatePatientAsync(Patient patient);
     Task DeletePatientAsync(int id);
@@ -29,6 +30,11 @@ public class PatientService : IPatientService
     public async Task<Patient?> GetPatientByIdAsync(int id)
     {
         return await _repository.GetByIdAsync(id);
+    }
+
+    public async Task<Patient?> GetPatientDetailsAsync(int id)
+    {
+        return await _repository.GetByIdWithDetailsAsync(id);
     }
 
     public async Task AddPatientAsync(Patient patient)
