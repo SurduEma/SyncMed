@@ -1,2 +1,5 @@
 .vs/
-./obj/Debug
+obj/Debug
+obj/Release
+bin/Debug
+bin/Release

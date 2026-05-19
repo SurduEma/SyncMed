@@ -1,0 +1,73 @@
+@page
+@model SyncMed.Pages.Prescriptions.IndexModel
+
+@{
+    ViewData["Title"] = "Prescriptions";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Prescriptions</h1>
+            <p class="text-muted mb-0">Medication orders and draft approvals</p>
+        </div>
+        @if (User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Nurse) || User.IsInRole(AppRoles.Admin))
+        {
+            <a asp-page="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Prescription
+            </a>
+        }
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    @if (!Model.Prescriptions.Any())
+    {
+        <div class="alert alert-info">No prescriptions found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Medication</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prescription in Model.Prescriptions)
+                    {
+                        <tr>
+                            <td>@prescription.DateIssued.ToLocalTime().ToString("dd MMM yyyy")</td>
+                            <td>
+                                <a asp-page="/Patients/Details" asp-route-id="@prescription.PatientId">
+                                    @prescription.Patient.User.FirstName @prescription.Patient.User.LastName
+                                </a>
+                            </td>
+                            <td>Dr. @prescription.Doctor.User.FirstName @prescription.Doctor.User.LastName</td>
+                            <td>@prescription.MedicationDetails</td>
+                            <td>
+                                <span class="badge @(prescription.Status == "Approved" ? "bg-success" : "bg-warning text-dark")">
+                                    @prescription.Status
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                @if (Model.CanApprove(prescription))
+                                {
+                                    <form method="post" asp-page-handler="Approve" asp-route-id="@prescription.PrescriptionId" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
