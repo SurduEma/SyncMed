@@ -9,6 +9,43 @@
     <h1>My Appointments</h1>
     <hr />
 
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Search Appointments</h5>
+        </div>
+        <div class="card-body p-4">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label asp-for="SearchDoctor" class="form-label">Doctor Name</label>
+                        <input asp-for="SearchDoctor" class="form-control" placeholder="e.g., Alice Smith" />
+                    </div>
+
+                    @if (Model.CanSearchPatient)
+                    {
+                        <div class="col-md-3">
+                            <label asp-for="SearchPatient" class="form-label">Patient Name</label>
+                            <input asp-for="SearchPatient" class="form-control" placeholder="e.g., John Doe" />
+                        </div>
+                    }
+
+                    <div class="col-md-3">
+                        <label asp-for="SearchDate" class="form-label">Date</label>
+                        <input asp-for="SearchDate" class="form-control" type="date" min="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.CanBookAppointments)
+    {
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Request a New Appointment</h5>
@@ -18,6 +55,17 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <div class="row g-3">
+                    @if (Model.CanChoosePatient)
+                    {
+                        <div class="col-md-3">
+                            <label asp-for="SelectedPatientId" class="form-label">Patient</label>
+                            <select asp-for="SelectedPatientId" asp-items="Model.PatientList" class="form-select">
+                                <option value="">-- Select a Patient --</option>
+                            </select>
+                            <span asp-validation-for="SelectedPatientId" class="text-danger"></span>
+                        </div>
+                    }
+
                     <div class="col-md-4">
                         <label asp-for="SelectedDoctorId" class="form-label">Doctor</label>
                         <select asp-for="SelectedDoctorId" asp-items="Model.DoctorList" class="form-select">
@@ -28,20 +76,20 @@
 
                     <div class="col-md-3">
                         <label asp-for="AppointmentDate" class="form-label">Date</label>
-                        <input asp-for="AppointmentDate" class="form-control" type="date"
-                               min="@DateOnly.FromDateTime(DateTime.Today.AddYears(DateTime.Today.Year < 2025 ? 2025 - DateTime.Today.Year : 0)).ToString("yyyy-MM-dd")"
+                        <input asp-for="AppointmentDate" asp-format="{0:yyyy-MM-dd}" class="form-control" type="date"
+                               min="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")"
                                id="appointmentDate" />
                         <span asp-validation-for="AppointmentDate" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-3">
                         <label asp-for="AppointmentTime" class="form-label">Time Slot</label>
-                        <input asp-for="AppointmentTime" type="hidden" id="AppointmentTimeHidden" />
+                        <input asp-for="AppointmentTime" asp-format="{0:HH\\:mm}" type="hidden" id="AppointmentTimeHidden" />
                         <select id="timeSlotSelect" class="form-select" disabled>
                             <option value="">-- Select a Time Slot --</option>
                         </select>
                         <span asp-validation-for="AppointmentTime" class="text-danger"></span>
-                        <small class="form-text text-muted">Available from 9:00 AM to 8:00 PM (30-min slots)</small>
+                            <small class="form-text text-muted">Available slots follow the selected doctor's working hours.</small>
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
@@ -51,11 +99,16 @@
             </form>
         </div>
     </div>
+    }
 
     @if (!Model.Appointments.Any())
     {
         <div class="alert alert-info">
-            <p class="mb-0">You have no appointments scheduled yet. Use the form above to book one.</p>
+            <p class="mb-0">
+                @(Model.HasSearched
+                    ? "No appointments found matching your search criteria."
+                    : "You have no appointments scheduled yet. Use the form above to book one.")
+            </p>
         </div>
     }
     else
@@ -65,6 +118,10 @@
                 <tr>
                     <th>Date</th>
                     <th>Time</th>
+                    @if (!User.IsInRole(AppRoles.Patient))
+                    {
+                        <th>Patient</th>
+                    }
                     <th>Doctor</th>
                     <th>Specialty</th>
                     <th>Status</th>
@@ -76,7 +133,15 @@
                 {
                     <tr>
                         <td>@appointment.AppointmentDate.ToString("dd MMM yyyy")</td>
-                        <td>@appointment.AppointmentTime.ToString("HH:mm") – @appointment.AppointmentTime.Add(TimeSpan.FromMinutes(30)).ToString("HH:mm")</td>
+                        <td>@appointment.AppointmentTime.ToString("HH:mm") - @appointment.AppointmentTime.Add(TimeSpan.FromMinutes(30)).ToString("HH:mm")</td>
+                        @if (!User.IsInRole(AppRoles.Patient))
+                        {
+                            <td>
+                                <a asp-page="/Patients/Details" asp-route-id="@appointment.PatientId">
+                                    @appointment.Patient.User.FirstName @appointment.Patient.User.LastName
+                                </a>
+                            </td>
+                        }
                         <td>Dr. @appointment.Doctor.User.FirstName @appointment.Doctor.User.LastName</td>
                         <td>@appointment.Doctor.Specialty</td>
                         <td>
@@ -93,8 +158,18 @@
                         <td>
                             @if (appointment.Status != "Cancelled")
                             {
-                                <a asp-page="Edit" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-warning">Edit</a>
-                                <a asp-page="Delete" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-danger">Cancel</a>
+                                @if (User.IsInRole(AppRoles.Admin))
+                                {
+                                    <a asp-page="Edit" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-warning">Edit</a>
+                                }
+                                @if (User.IsInRole(AppRoles.Admin) || User.IsInRole(AppRoles.Patient))
+                                {
+                                    <a asp-page="Delete" asp-route-id="@appointment.AppointmentId" class="btn btn-sm btn-danger">Cancel</a>
+                                }
+                                @if (User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Nurse) || User.IsInRole(AppRoles.Admin))
+                                {
+                                    <a asp-page="/Patients/Details" asp-route-id="@appointment.PatientId" class="btn btn-sm btn-info">Record</a>
+                                }
                             }
                         </td>
                     </tr>
@@ -111,7 +186,17 @@
         const timeSlotSelect = document.getElementById('timeSlotSelect');
         const timeSlotHidden = document.getElementById('AppointmentTimeHidden');
 
+        if (!doctorSelect || !dateInput || !timeSlotSelect || !timeSlotHidden) {
+            return;
+        }
+
         // Function to fetch and populate time slots
+        function isWeekend(dateValue) {
+            const date = new Date(`${dateValue}T00:00:00`);
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
         async function updateTimeSlots() {
             const doctorId = doctorSelect.value;
             const date = dateInput.value;
@@ -124,10 +209,30 @@
                 return;
             }
 
+            if (isWeekend(date)) {
+                timeSlotSelect.disabled = true;
+                timeSlotSelect.innerHTML = '<option value="">-- Weekends unavailable --</option>';
+                timeSlotHidden.value = '';
+                dateInput.setCustomValidity('Please choose a weekday.');
+                dateInput.reportValidity();
+                return;
+            }
+
+            dateInput.setCustomValidity('');
+
             try {
                 // Fetch available time slots from server
-                const response = await fetch(`?handler=GetTimeSlots&doctorId=${doctorId}&date=${date}`);
-                const slots = await response.json();
+                const response = await fetch(`?handler=TimeSlots&doctorId=${doctorId}&date=${date}`);
+                if (!response.ok) {
+                    console.error('Time slots request failed:', response.status, response.statusText);
+                }
+                const text = await response.text();
+                let slots = [];
+                try {
+                    slots = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Failed to parse time slots response:', parseError, text);
+                }
 
                 // Populate time slot dropdown
                 timeSlotSelect.innerHTML = '<option value="">-- Select a Time Slot --</option>';
@@ -139,6 +244,10 @@
                 });
 
                 timeSlotSelect.disabled = slots.length === 0;
+
+                if (timeSlotHidden.value) {
+                    timeSlotSelect.value = timeSlotHidden.value;
+                }
 
                 if (slots.length === 0) {
                     const option = document.createElement('option');
@@ -154,7 +263,20 @@
 
         // Update time slots when doctor or date changes
         doctorSelect.addEventListener('change', updateTimeSlots);
-        dateInput.addEventListener('change', updateTimeSlots);
+        dateInput.addEventListener('change', function () {
+            if (dateInput.value && isWeekend(dateInput.value)) {
+                dateInput.value = '';
+                dateInput.setCustomValidity('Please choose a weekday.');
+                dateInput.reportValidity();
+                timeSlotSelect.disabled = true;
+                timeSlotSelect.innerHTML = '<option value="">-- Weekends unavailable --</option>';
+                timeSlotHidden.value = '';
+                return;
+            }
+
+            dateInput.setCustomValidity('');
+            updateTimeSlots();
+        });
 
         // Update hidden field when time slot selection changes
         timeSlotSelect.addEventListener('change', function() {

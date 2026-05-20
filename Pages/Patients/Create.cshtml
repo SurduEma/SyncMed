@@ -35,8 +35,15 @@
                         </div>
 
                         <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Temporary Password</label>
+                            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
                             <label asp-for="Patient.DateOfBirth" class="form-label">Date of Birth</label>
-                            <input asp-for="Patient.DateOfBirth" class="form-control" type="date" />
+                            <input name="Patient.DateOfBirth" id="Patient_DateOfBirth" class="form-control" type="date" 
+                                   value="@(Model.Patient?.DateOfBirth == default(DateOnly) ? "" : Model.Patient.DateOfBirth.ToString("yyyy-MM-dd"))" />
                             <span asp-validation-for="Patient.DateOfBirth" class="text-danger small"></span>
                         </div>
 

@@ -19,18 +19,21 @@ public class AppointmentService : IAppointmentService
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IDoctorRepository _doctorRepository;
     private readonly IPatientRepository _patientRepository;
+    private readonly IAppointmentNotificationService _notificationService;
     private const int AppointmentDurationMinutes = 30;
-    private const int WorkingHoursStart = 9; // 9:00 AM
-    private const int WorkingHoursEnd = 20; // 8:00 PM
+    private static readonly TimeOnly DefaultWorkingHoursStart = new(9, 0);
+    private static readonly TimeOnly DefaultWorkingHoursEnd = new(20, 0);
 
     public AppointmentService(
         IAppointmentRepository appointmentRepository,
         IDoctorRepository doctorRepository,
-        IPatientRepository patientRepository)
+        IPatientRepository patientRepository,
+        IAppointmentNotificationService notificationService)
     {
         _appointmentRepository = appointmentRepository;
         _doctorRepository = doctorRepository;
         _patientRepository = patientRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<IList<Appointment>> GetAllAppointmentsAsync()
@@ -46,17 +49,12 @@ public class AppointmentService : IAppointmentService
     public async Task<(bool Success, string Message)> BookAppointmentAsync(
         int patientId, int doctorId, DateOnly date, TimeOnly time)
     {
-        // Validate year is 2025 or later
-        if (date.Year < 2025)
-            return (false, "Appointments can only be booked for 2025 or later.");
-
         // Validate date is not in the past
         if (date < DateOnly.FromDateTime(DateTime.Today))
             return (false, "Cannot book appointment in the past.");
 
-        // Validate time is within working hours
-        if (time.Hour < WorkingHoursStart || time.Hour >= WorkingHoursEnd)
-            return (false, $"Appointments must be booked between {WorkingHoursStart}:00 AM and {WorkingHoursEnd}:00 PM.");
+        if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            return (false, "Appointments cannot be booked on weekends.");
 
         // Validate time slot is on 30-minute intervals (00 or 30 minutes)
         if (time.Minute != 0 && time.Minute != 30)
@@ -76,6 +74,10 @@ public class AppointmentService : IAppointmentService
         if (doctor == null)
             return (false, "Doctor not found.");
 
+        var (workingStart, workingEnd) = GetWorkingHours(doctor);
+        if (time < workingStart || time >= workingEnd)
+            return (false, $"Appointments with this doctor must be booked between {workingStart:HH\\:mm} and {workingEnd:HH\\:mm}.");
+
         // Check for time-slot overlap
         var sameDayAppointments = await _appointmentRepository.GetByDoctorAndDateAsync(doctorId, date);
         var slotDuration = TimeSpan.FromMinutes(AppointmentDurationMinutes);
@@ -87,7 +89,7 @@ public class AppointmentService : IAppointmentService
             && requestedEnd > existing.AppointmentTime);
 
         if (hasConflict)
-            return (false, $"This time slot overlaps with an existing appointment. Each appointment lasts {AppointmentDurationMinutes} minutes — please choose a different time.");
+            return (false, $"This time slot overlaps with an existing appointment. Each appointment lasts {AppointmentDurationMinutes} minutes - please choose a different time.");
 
         // Create and save appointment
         var appointment = new Appointment
@@ -100,6 +102,10 @@ public class AppointmentService : IAppointmentService
         };
 
         await _appointmentRepository.AddAsync(appointment);
+        appointment.Patient = patient;
+        appointment.Doctor = doctor;
+        await _notificationService.SendAppointmentConfirmationAsync(appointment);
+
         return (true, "Appointment booked successfully!");
     }
 
@@ -109,7 +115,13 @@ public class AppointmentService : IAppointmentService
         if (existingAppointment == null)
             throw new InvalidOperationException("Appointment not found.");
 
-        await _appointmentRepository.UpdateAsync(appointment);
+        existingAppointment.PatientId = appointment.PatientId;
+        existingAppointment.DoctorId = appointment.DoctorId;
+        existingAppointment.AppointmentDate = appointment.AppointmentDate;
+        existingAppointment.AppointmentTime = appointment.AppointmentTime;
+        existingAppointment.Status = appointment.Status;
+
+        await _appointmentRepository.UpdateAsync(existingAppointment);
     }
 
     public async Task<(bool Success, string Message)> CancelAppointmentAsync(int appointmentId)
@@ -143,12 +155,17 @@ public class AppointmentService : IAppointmentService
     public async Task<List<TimeOnly>> GetAvailableTimeSlotsAsync(int doctorId, DateOnly date)
     {
         var availableSlots = new List<TimeOnly>();
+        if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            return availableSlots;
 
-        // Generate all possible time slots (9:00 AM to 8:00 PM in 30-minute intervals)
-        for (int hour = WorkingHoursStart; hour < WorkingHoursEnd; hour++)
+        var doctor = await _doctorRepository.GetByIdAsync(doctorId);
+        if (doctor == null)
+            return availableSlots;
+
+        var (workingStart, workingEnd) = GetWorkingHours(doctor);
+        for (var slot = workingStart; slot < workingEnd; slot = slot.Add(TimeSpan.FromMinutes(AppointmentDurationMinutes)))
         {
-            availableSlots.Add(new TimeOnly(hour, 0));
-            availableSlots.Add(new TimeOnly(hour, 30));
+            availableSlots.Add(slot);
         }
 
         // Get all appointments for this doctor on this date
@@ -174,5 +191,25 @@ public class AppointmentService : IAppointmentService
         }
 
         return availableSlots;
+    }
+
+    private static (TimeOnly Start, TimeOnly End) GetWorkingHours(Doctor doctor)
+    {
+        if (!string.IsNullOrWhiteSpace(doctor.WorkingHours))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(
+                doctor.WorkingHours,
+                @"(?<start>\d{1,2}:\d{2})\s*-\s*(?<end>\d{1,2}:\d{2})");
+
+            if (match.Success
+                && TimeOnly.TryParse(match.Groups["start"].Value, out var start)
+                && TimeOnly.TryParse(match.Groups["end"].Value, out var end)
+                && start < end)
+            {
+                return (start, end);
+            }
+        }
+
+        return (DefaultWorkingHoursStart, DefaultWorkingHoursEnd);
     }
 }

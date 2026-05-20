@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Pages\Users\" />
     <Folder Include="Views\Home\" />
+    <Folder Include="Views\Shared\" />
   </ItemGroup>
 
 </Project>

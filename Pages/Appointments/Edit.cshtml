@@ -4,66 +4,182 @@
     ViewData["Title"] = "Edit Appointment";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Edit Appointment</h4>
+<div class="container mt-4">
+    <h1>Edit Appointment</h1>
+    <hr />
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form method="post" asp-page="./Edit" asp-route-id="@Model.Appointment.AppointmentId" id="appointment-edit-form">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input type="hidden" asp-for="Appointment.AppointmentId" id="AppointmentId" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="Appointment.PatientId" class="form-label">Patient</label>
+                        <select asp-for="Appointment.PatientId" asp-items="Model.PatientList" class="form-select">
+                            <option value="">-- Select Patient --</option>
+                        </select>
+                        <span asp-validation-for="Appointment.PatientId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Appointment.DoctorId" class="form-label">Doctor</label>
+                        <select asp-for="Appointment.DoctorId" asp-items="Model.DoctorList" class="form-select" id="appointmentDoctor">
+                            <option value="">-- Select Doctor --</option>
+                        </select>
+                        <span asp-validation-for="Appointment.DoctorId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Appointment.AppointmentDate" class="form-label">Date</label>
+                        <input asp-for="Appointment.AppointmentDate" asp-format="{0:yyyy-MM-dd}" class="form-control" type="date"
+                               id="appointmentDate" />
+                        <span asp-validation-for="Appointment.AppointmentDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Appointment.AppointmentTime" class="form-label">Time Slot</label>
+                        <select asp-for="Appointment.AppointmentTime" class="form-select" id="timeSlotSelect"
+                                data-current="@Model.Appointment.AppointmentTime.ToString("HH:mm")" disabled>
+                            <option value="">-- Select a Time Slot --</option>
+                        </select>
+                        <span asp-validation-for="Appointment.AppointmentTime" class="text-danger"></span>
+                        <small class="form-text text-muted">Available slots follow the selected doctor's working hours.</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Appointment.Status" class="form-label">Status</label>
+                        <select asp-for="Appointment.Status" asp-items="Model.StatusList" class="form-select">
+                            <option value="">-- Select Status --</option>
+                        </select>
+                        <span asp-validation-for="Appointment.Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 mt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Confirm
+                        </button>
+                        <a asp-page="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <form method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-                        <input type="hidden" asp-for="Appointment.AppointmentId" />
-
-                        <div class="mb-3">
-                            <label asp-for="Appointment.PatientId" class="form-label">Patient</label>
-                            <select asp-for="Appointment.PatientId" asp-items="Model.PatientList" class="form-select">
-                                <option value="">-- Select Patient --</option>
-                            </select>
-                            <span asp-validation-for="Appointment.PatientId" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Appointment.DoctorId" class="form-label">Doctor</label>
-                            <select asp-for="Appointment.DoctorId" asp-items="Model.DoctorList" class="form-select">
-                                <option value="">-- Select Doctor --</option>
-                            </select>
-                            <span asp-validation-for="Appointment.DoctorId" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Appointment.AppointmentDate" class="form-label">Appointment Date</label>
-                            <input type="date" asp-for="Appointment.AppointmentDate" class="form-control" />
-                            <span asp-validation-for="Appointment.AppointmentDate" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Appointment.AppointmentTime" class="form-label">Appointment Time</label>
-                            <input type="time" asp-for="Appointment.AppointmentTime" class="form-control" />
-                            <span asp-validation-for="Appointment.AppointmentTime" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Appointment.Status" class="form-label">Status</label>
-                            <select asp-for="Appointment.Status" asp-items="Model.StatusList" class="form-select">
-                                <option value="">-- Select Status --</option>
-                            </select>
-                            <span asp-validation-for="Appointment.Status" class="text-danger small"></span>
-                        </div>
-
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                            <a asp-page="Index" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const doctorSelect = document.getElementById('appointmentDoctor');
+            const dateInput = document.getElementById('appointmentDate');
+            const timeSlotSelect = document.getElementById('timeSlotSelect');
+            const appointmentId = document.getElementById('AppointmentId')?.value;
+
+            function isWeekend(dateValue) {
+                const date = new Date(`${dateValue}T00:00:00`);
+                const day = date.getDay();
+                return day === 0 || day === 6;
+            }
+
+            async function updateTimeSlots() {
+                if (!doctorSelect || !dateInput || !timeSlotSelect) {
+                    return;
+                }
+
+                const doctorId = doctorSelect.value;
+                const date = dateInput.value;
+
+                if (!doctorId || !date) {
+                    timeSlotSelect.disabled = true;
+                    timeSlotSelect.innerHTML = '<option value="">-- Select a Time Slot --</option>';
+                    return;
+                }
+
+                if (isWeekend(date)) {
+                    timeSlotSelect.disabled = true;
+                    timeSlotSelect.innerHTML = '<option value="">-- Weekends unavailable --</option>';
+                    dateInput.setCustomValidity('Please choose a weekday.');
+                    dateInput.reportValidity();
+                    return;
+                }
+
+                dateInput.setCustomValidity('');
+
+                try {
+                    const response = await fetch(`?handler=TimeSlots&doctorId=${doctorId}&date=${date}&appointmentId=${appointmentId}`);
+                    if (!response.ok) {
+                        console.error('Time slots request failed:', response.status, response.statusText);
+                    }
+                    const text = await response.text();
+                    let slots = [];
+                    try {
+                        slots = JSON.parse(text);
+                    } catch (parseError) {
+                        console.error('Failed to parse time slots response:', parseError, text);
+                    }
+
+                    timeSlotSelect.innerHTML = '<option value="">-- Select a Time Slot --</option>';
+                    slots.forEach(slot => {
+                        const option = document.createElement('option');
+                        option.value = slot;
+                        const startTime = slot;
+                        const [hours, minutes] = startTime.split(':');
+                        const endDate = new Date(2000, 0, 1, parseInt(hours), parseInt(minutes));
+                        endDate.setMinutes(endDate.getMinutes() + 30);
+                        const endTime = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
+                        option.textContent = `${startTime} – ${endTime}`;
+                        timeSlotSelect.appendChild(option);
+                    });
+
+                    timeSlotSelect.disabled = slots.length === 0;
+
+                    const currentValue = timeSlotSelect.dataset.current;
+                    if (currentValue) {
+                        timeSlotSelect.value = currentValue.length === 5 ? currentValue + ':00' : currentValue;
+                        if (!timeSlotSelect.value) {
+                            timeSlotSelect.value = currentValue;
+                        }
+                    }
+
+                    if (slots.length === 0) {
+                        const option = document.createElement('option');
+                        option.textContent = '-- No available slots --';
+                        option.disabled = true;
+                        timeSlotSelect.appendChild(option);
+                    }
+                } catch (error) {
+                    console.error('Error fetching time slots:', error);
+                    timeSlotSelect.disabled = true;
+                }
+            }
+
+            if (doctorSelect && dateInput) {
+                doctorSelect.addEventListener('change', updateTimeSlots);
+                dateInput.addEventListener('change', function () {
+                    if (dateInput.value && isWeekend(dateInput.value)) {
+                        dateInput.value = '';
+                        dateInput.setCustomValidity('Please choose a weekday.');
+                        dateInput.reportValidity();
+                        timeSlotSelect.disabled = true;
+                        timeSlotSelect.innerHTML = '<option value="">-- Weekends unavailable --</option>';
+                        return;
+                    }
+
+                    dateInput.setCustomValidity('');
+                    updateTimeSlots();
+                });
+            }
+
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+
+            updateTimeSlots();
+        });
+    </script>
+}

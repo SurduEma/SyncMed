@@ -6,6 +6,7 @@ namespace SyncMed.Data.Repositories;
 public interface IPatientRepository : IGenericRepository<Patient>
 {
     Task<IList<Patient>> GetAllWithUserAsync();
+    Task<Patient?> GetByIdWithDetailsAsync(int id);
 }
 
 public class PatientRepository : IPatientRepository
@@ -33,6 +34,27 @@ public class PatientRepository : IPatientRepository
     {
         return await _context.Patients
             .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.PatientId == id);
+    }
+
+    public async Task<Patient?> GetByIdWithDetailsAsync(int id)
+    {
+        return await _context.Patients
+            .Include(p => p.User)
+            .Include(p => p.Appointments)
+                .ThenInclude(a => a.Doctor)
+                    .ThenInclude(d => d.User)
+            .Include(p => p.Appointments)
+                .ThenInclude(a => a.Consultation)
+            .Include(p => p.Prescriptions)
+                .ThenInclude(pr => pr.Doctor)
+                    .ThenInclude(d => d.User)
+            .Include(p => p.Prescriptions)
+                .ThenInclude(pr => pr.DraftedByNurse)
+                    .ThenInclude(n => n!.User)
+            .Include(p => p.TestResults)
+                .ThenInclude(t => t.UploadedByDoctor)
+                    .ThenInclude(d => d.User)
             .FirstOrDefaultAsync(p => p.PatientId == id);
     }
 

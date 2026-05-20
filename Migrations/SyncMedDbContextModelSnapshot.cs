@@ -122,6 +122,36 @@ namespace SyncMed.Migrations
                     b.ToTable("Doctors");
                 });
 
+            modelBuilder.Entity("SyncMed.Models.MedicalService", b =>
+                {
+                    b.Property<int>("MedicalServiceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicalServiceId"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Specialty")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("MedicalServiceId");
+
+                    b.ToTable("MedicalServices");
+                });
+
             modelBuilder.Entity("SyncMed.Models.Nurse", b =>
                 {
                     b.Property<int>("NurseId")

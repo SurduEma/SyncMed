@@ -1,32 +1,50 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SyncMed.Authorization;
 using SyncMed.Models;
 using SyncMed.Services;
 
 namespace SyncMed.Pages.Doctors;
 
+[Authorize(Roles = AppRoles.AdminOnly)]
 public class CreateModel : PageModel
 {
     private readonly IDoctorService _service;
+    private readonly IUserAccountService _userAccountService;
 
-    public CreateModel(IDoctorService service)
+    public CreateModel(IDoctorService service, IUserAccountService userAccountService)
     {
         _service = service;
+        _userAccountService = userAccountService;
     }
 
     [BindProperty]
     public Doctor Doctor { get; set; } = default!;
 
+    [BindProperty]
+    [Required, DataType(DataType.Password), MinLength(8)]
+    public string Password { get; set; } = string.Empty;
+
+    public SelectList Specialties { get; set; } = default!;
+
     public IActionResult OnGet()
     {
         Doctor = new Doctor { User = new User() };
+        LoadSpecialties();
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        ModelState.Remove("Doctor.User.PasswordHash");
+        ModelState.Remove("Doctor.User.Role");
+
         if (!ModelState.IsValid)
         {
+            LoadSpecialties();
             return Page();
         }
 
@@ -34,12 +52,10 @@ public class CreateModel : PageModel
         {
             // Create user first
             var user = Doctor.User;
-            user.PasswordHash = "temp-hash";
-            user.Role = "Doctor";
+            user.PasswordHash = _userAccountService.HashPassword(user, Password);
+            user.Role = AppRoles.Doctor;
             user.CreatedAt = DateTime.UtcNow;
 
-            // We need to manually handle user creation via a service or context
-            // For now, we'll use the doctor service which should handle this
             await _service.AddDoctorAsync(Doctor);
 
             return RedirectToPage("Index");
@@ -47,7 +63,27 @@ public class CreateModel : PageModel
         catch (Exception ex)
         {
             ModelState.AddModelError(string.Empty, $"Error: {ex.Message}");
+            LoadSpecialties();
             return Page();
         }
+    }
+
+    private void LoadSpecialties()
+    {
+        Specialties = new SelectList(new List<string>
+        {
+            "General Practice",
+            "Cardiology",
+            "Neurology",
+            "Pediatrics",
+            "Dermatology",
+            "Orthopedics",
+            "Gastroenterology",
+            "ENT",
+            "Ophthalmology",
+            "Psychiatry",
+            "Endocrinology",
+            "Urology"
+        });
     }
 }

@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SyncMed.Authorization;
 using SyncMed.Models;
 using SyncMed.Services;
 
 namespace SyncMed.Pages.Specialties;
 
+[Authorize(Roles = AppRoles.AdminOnly)]
 public class EditModel : PageModel
 {
     private readonly IDoctorService _doctorService;
@@ -28,6 +31,9 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        ModelState.Remove("Doctor.User.PasswordHash");
+        ModelState.Remove("Doctor.User.Role");
+
         if (!ModelState.IsValid)
             return Page();
 

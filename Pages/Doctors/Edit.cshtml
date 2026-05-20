@@ -38,7 +38,9 @@
 
                         <div class="mb-3">
                             <label asp-for="Doctor.Specialty" class="form-label">Specialty</label>
-                            <input asp-for="Doctor.Specialty" class="form-control" />
+                            <select asp-for="Doctor.Specialty" asp-items="Model.Specialties" class="form-select">
+                                <option value="">-- Select Specialty --</option>
+                            </select>
                             <span asp-validation-for="Doctor.Specialty" class="text-danger small"></span>
                         </div>
 
@@ -50,7 +52,7 @@
 
                         <div class="mb-3">
                             <label asp-for="Doctor.WorkingHours" class="form-label">Working Hours</label>
-                            <input asp-for="Doctor.WorkingHours" class="form-control" />
+                            <input asp-for="Doctor.WorkingHours" class="form-control" placeholder="Mon-Fri 09:00-17:00" />
                             <span asp-validation-for="Doctor.WorkingHours" class="text-danger small"></span>
                         </div>
 

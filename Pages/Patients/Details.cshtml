@@ -1,0 +1,153 @@
+@page "{id:int}"
+@model SyncMed.Pages.Patients.DetailsModel
+
+@{
+    ViewData["Title"] = "Patient Record";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1>@Model.Patient.User.FirstName @Model.Patient.User.LastName</h1>
+            <p class="text-muted mb-0">@Model.Patient.User.Email</p>
+            <p class="text-muted">@Model.Patient.PhoneNumber</p>
+        </div>
+        @if (User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Nurse) || User.IsInRole(AppRoles.Admin))
+        {
+            <div class="d-flex gap-2">
+                <a asp-page="/Prescriptions/Create" asp-route-patientId="@Model.Patient.PatientId" class="btn btn-primary">
+                    <i class="fas fa-prescription"></i> Prescription
+                </a>
+                @if (User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Admin))
+                {
+                    <a asp-page="/TestResults/Create" asp-route-patientId="@Model.Patient.PatientId" class="btn btn-outline-primary">
+                        <i class="fas fa-file-medical"></i> Test Result
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">Appointments and Consultations</h2>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Patient.Appointments.Any())
+                    {
+                        <p class="text-muted mb-0">No appointments yet.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var appointment in Model.Patient.Appointments.OrderByDescending(a => a.AppointmentDate).ThenByDescending(a => a.AppointmentTime))
+                            {
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>@appointment.AppointmentDate.ToString("dd MMM yyyy") @appointment.AppointmentTime.ToString("HH:mm")</strong>
+                                            <div class="text-muted">Dr. @appointment.Doctor.User.FirstName @appointment.Doctor.User.LastName - @appointment.Doctor.Specialty</div>
+                                        </div>
+                                        <span class="badge bg-secondary align-self-start">@appointment.Status</span>
+                                    </div>
+
+                                    @if (appointment.Consultation != null)
+                                    {
+                                        <div class="mt-2 small">
+                                            @if (!string.IsNullOrWhiteSpace(appointment.Consultation.Vitals))
+                                            {
+                                                <div><strong>Vitals:</strong> @appointment.Consultation.Vitals</div>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(appointment.Consultation.Symptoms))
+                                            {
+                                                <div><strong>Symptoms:</strong> @appointment.Consultation.Symptoms</div>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(appointment.Consultation.Diagnosis))
+                                            {
+                                                <div><strong>Diagnosis:</strong> @appointment.Consultation.Diagnosis</div>
+                                            }
+                                        </div>
+                                    }
+
+                                    @if (User.IsInRole(AppRoles.Nurse) || User.IsInRole(AppRoles.Admin) || User.IsInRole(AppRoles.Doctor))
+                                    {
+                                        <div class="mt-2 d-flex gap-2 flex-wrap">
+                                            @if (User.IsInRole(AppRoles.Nurse) || User.IsInRole(AppRoles.Admin))
+                                            {
+                                                <a asp-page="/Consultations/RecordVitals" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-sm btn-outline-primary">Vitals</a>
+                                            }
+                                            @if (User.IsInRole(AppRoles.Doctor) || User.IsInRole(AppRoles.Admin))
+                                            {
+                                                <a asp-page="/Consultations/Notes" asp-route-appointmentId="@appointment.AppointmentId" class="btn btn-sm btn-outline-secondary">Notes</a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">Prescriptions</h2>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Patient.Prescriptions.Any())
+                    {
+                        <p class="text-muted mb-0">No prescriptions recorded.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var prescription in Model.Patient.Prescriptions.OrderByDescending(p => p.DateIssued))
+                            {
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>@prescription.DateIssued.ToLocalTime().ToString("dd MMM yyyy")</strong>
+                                        <span class="badge @(prescription.Status == "Approved" ? "bg-success" : "bg-warning text-dark")">@prescription.Status</span>
+                                    </div>
+                                    <div>@prescription.MedicationDetails</div>
+                                    <div class="text-muted small">Dr. @prescription.Doctor.User.FirstName @prescription.Doctor.User.LastName</div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">Test Results</h2>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Patient.TestResults.Any())
+                    {
+                        <p class="text-muted mb-0">No test results uploaded.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var test in Model.Patient.TestResults.OrderByDescending(t => t.DateUploaded))
+                            {
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>@test.TestName</strong>
+                                        <span class="text-muted small">@test.DateUploaded.ToLocalTime().ToString("dd MMM yyyy")</span>
+                                    </div>
+                                    <a href="@test.DocumentUrl" target="_blank" rel="noopener">@test.DocumentUrl</a>
+                                    <div class="text-muted small">Uploaded by Dr. @test.UploadedByDoctor.User.FirstName @test.UploadedByDoctor.User.LastName</div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
