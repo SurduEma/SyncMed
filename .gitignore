@@ -1,5 +1,15 @@
+# Fișiere și foldere de compilare
+bin/
+obj/
+
+# Setări specifice Visual Studio
 .vs/
-obj/Debug
-obj/Release
-bin/Debug
-bin/Release
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Fișiere OS temporare
+Thumbs.db
+ehthumbs.db
+Desktop.ini
